@@ -16,6 +16,7 @@
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 13px; color: #d1d5db; margin-bottom: 6px; font-weight: 500; }
     .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; background: #050308; border: 1px solid rgba(228,0,117,0.3); border-radius: 8px; color: #fff; outline: none; font-size: 13px; font-family: inherit; }
+    .form-group input[type="file"] { padding: 8px 10px; cursor: pointer; }
     .form-group input:focus, .form-group textarea:focus { border-color: #e40075; box-shadow: 0 0 10px rgba(228, 0, 117, 0.4); }
     .help-text { font-size: 11px; color: #9ca3af; margin-top: 4px; line-height: 1.4; }
     .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; margin-top: 10px; font-size: 14px; transition: all 0.2s; }
@@ -29,7 +30,9 @@
     #poster { 
       width: 420px; 
       min-height: 720px; 
-      background: #09030c; 
+      background-color: #09030c; 
+      background-size: cover;
+      background-position: center;
       color: #fff; 
       padding: 35px 24px 30px; 
       position: relative; 
@@ -42,23 +45,20 @@
     }
 
     /* 丰富背景装饰层 */
-    /* 1. 顶部主粉色大光晕 */
-    .bg-light-1 { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 360px; height: 360px; background: radial-gradient(circle, rgba(228,0,117,0.4) 0%, rgba(0,0,0,0) 70%); pointer-events: none; }
-    /* 2. 底部辅紫色光晕 */
-    .bg-light-2 { position: absolute; bottom: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(147,51,234,0.25) 0%, rgba(0,0,0,0) 70%); pointer-events: none; }
-    /* 3. 赛博网格背景 */
-    .bg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(228, 0, 117, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(228, 0, 117, 0.06) 1px, transparent 1px); background-size: 24px 24px; pointer-events: none; }
-    /* 4. 装饰性斜向科技切线 */
-    .bg-lines { position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(228, 0, 117, 0.03) 15px, rgba(228, 0, 117, 0.03) 16px); pointer-events: none; }
-    /* 5. 顶角赛博几何边角装饰 */
-    .corner-dec-top { position: absolute; top: 12px; left: 12px; right: 12px; height: 2px; background: linear-gradient(90deg, #e40075, transparent, #e40075); opacity: 0.6; }
+    /* 上传图片时自动开启的暗色遮罩保护层 */
+    .bg-overlay { position: absolute; inset: 0; background: rgba(9, 3, 12, 0.75); pointer-events: none; z-index: 1; display: none; }
+    .bg-light-1 { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 360px; height: 360px; background: radial-gradient(circle, rgba(228,0,117,0.35) 0%, rgba(0,0,0,0) 70%); pointer-events: none; z-index: 1; }
+    .bg-light-2 { position: absolute; bottom: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(147,51,234,0.2) 0%, rgba(0,0,0,0) 70%); pointer-events: none; z-index: 1; }
+    .bg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(228, 0, 117, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(228, 0, 117, 0.05) 1px, transparent 1px); background-size: 24px 24px; pointer-events: none; z-index: 1; }
+    .bg-lines { position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(228, 0, 117, 0.02) 15px, rgba(228, 0, 117, 0.02) 16px); pointer-events: none; z-index: 1; }
+    .corner-dec-top { position: absolute; top: 12px; left: 12px; right: 12px; height: 2px; background: linear-gradient(90deg, #e40075, transparent, #e40075); opacity: 0.6; z-index: 2; }
 
     /* 头部 Logo 区域 */
     .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 20px; }
     .brand-logo-container { margin-bottom: 12px; display: flex; justify-content: center; align-items: center; min-height: 70px; }
     .brand-logo { max-height: 80px; max-width: 240px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(228, 0, 117, 0.6)); }
 
-    /* 黑粉发光标签 */
+    /* 黑粉发光标签与标题 */
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); }
     .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; background: linear-gradient(180deg, #ffffff 30%, #e40075 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(228, 0, 117, 0.5); }
 
@@ -67,24 +67,10 @@
     
     /* 列表卡片结构 */
     .rank-item { display: flex; align-items: center; padding: 10px 16px; background: rgba(20, 10, 28, 0.75); border: 1px solid rgba(228, 0, 117, 0.2); backdrop-filter: blur(10px); border-radius: 10px; position: relative; }
-    
-    /* 前三名专属黑粉战报发光高亮 */
-    .top-1 { 
-      background: linear-gradient(90deg, rgba(228,0,117,0.3) 0%, rgba(20,10,28,0.9) 100%); 
-      border: 1px solid #e40075; 
-      box-shadow: 0 0 20px rgba(228, 0, 117, 0.4); 
-      padding: 13px 16px; 
-    }
-    .top-2 { 
-      background: linear-gradient(90deg, rgba(228,0,117,0.18) 0%, rgba(20,10,28,0.85) 100%); 
-      border: 1px solid rgba(228, 0, 117, 0.6); 
-    }
-    .top-3 { 
-      background: linear-gradient(90deg, rgba(228,0,117,0.12) 0%, rgba(20,10,28,0.85) 100%); 
-      border: 1px solid rgba(228, 0, 117, 0.4); 
-    }
+    .top-1 { background: linear-gradient(90deg, rgba(228,0,117,0.35) 0%, rgba(20,10,28,0.9) 100%); border: 1px solid #e40075; box-shadow: 0 0 20px rgba(228, 0, 117, 0.4); padding: 13px 16px; }
+    .top-2 { background: linear-gradient(90deg, rgba(228,0,117,0.18) 0%, rgba(20,10,28,0.85) 100%); border: 1px solid rgba(228, 0, 117, 0.6); }
+    .top-3 { background: linear-gradient(90deg, rgba(228,0,117,0.12) 0%, rgba(20,10,28,0.85) 100%); border: 1px solid rgba(228, 0, 117, 0.4); }
 
-    /* 序号徽章 */
     .rank-badge { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 15px; border-radius: 8px; background: rgba(255,255,255,0.05); color: #8b8b9e; }
     .top-1 .rank-badge { background: linear-gradient(135deg, #e40075 0%, #ff66b3 100%); color: #fff; box-shadow: 0 0 12px rgba(228, 0, 117, 0.8); }
     .top-2 .rank-badge { background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%); color: #000; }
@@ -105,8 +91,14 @@
 <body>
 
   <div class="control-panel">
-    <h2>⚡ 战报数据录入（黑粉版）</h2>
+    <h2>⚡ 战报数据录入</h2>
     
+    <div class="form-group">
+      <label>自定义海报背景图（可选）</label>
+      <input type="file" id="input-bg" accept="image/*" onchange="changeBg(event)">
+      <div class="help-text">💡 不上传则默认使用黑粉发光科技背景。点击可上传本地图片作为背景。</div>
+    </div>
+
     <div class="form-group">
       <label>榜单日期</label>
       <input type="text" id="input-date" value="2026.08.07">
@@ -114,8 +106,8 @@
 
     <div class="form-group">
       <label>批量粘贴 Excel 数据（姓名 跑店数）</label>
-      <textarea id="input-raw-data" rows="10" placeholder="例如：&#10;张伟 18&#10;李娜 15&#10;王强 12&#10;刘洋 10&#10;陈杰 8"></textarea>
-      <div class="help-text">💡 提示：支持粘贴任意人数！会自动按跑店数高低排序并完全展示。</div>
+      <textarea id="input-raw-data" rows="8" placeholder="例如：&#10;张伟 18&#10;李娜 15&#10;王强 12&#10;刘洋 10&#10;陈杰 8"></textarea>
+      <div class="help-text">💡 支持粘贴任意人数！系统自动排序并完全展示。</div>
     </div>
 
     <button class="btn btn-primary" onclick="updatePoster()">🔄 生成高保真预览</button>
@@ -124,6 +116,7 @@
 
   <div class="preview-panel">
     <div id="poster">
+      <div class="bg-overlay" id="bg-overlay"></div>
       <div class="bg-light-1"></div>
       <div class="bg-light-2"></div>
       <div class="bg-grid"></div>
@@ -150,6 +143,21 @@
   <script>
     document.getElementById('input-raw-data').value = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6\n周杰 5";
 
+    // 方案 B：本地图片实时读取并作为背景
+    function changeBg(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const poster = document.getElementById('poster');
+          const overlay = document.getElementById('bg-overlay');
+          poster.style.backgroundImage = `url('${e.target.result}')`;
+          overlay.style.display = 'block'; // 启用防暗不清晰的保真遮罩层
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
     function updatePoster() {
       // 1. 更新日期
       const dateVal = document.getElementById('input-date').value;
@@ -174,7 +182,6 @@
       // 自动按跑店数量由高到低排序
       listData.sort((a, b) => b.count - a.count);
 
-      // 不限制人数，完全保留所有人员数据
       const container = document.getElementById('rank-container');
       container.innerHTML = '';
 
