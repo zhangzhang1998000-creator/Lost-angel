@@ -28,7 +28,7 @@
     /* 高阶海报主体结构 */
     #poster { 
       width: 420px; 
-      height: 740px; 
+      height: 760px; 
       background: #0d111a; 
       color: #fff; 
       padding: 30px 24px; 
@@ -40,62 +40,33 @@
       border-radius: 4px;
     }
 
-    /* 酷炫背景科技发光层 */
+    /* 背景发光层 */
     .bg-light-1 { position: absolute; top: -80px; left: -80px; width: 260px; height: 260px; background: radial-gradient(circle, rgba(59,130,246,0.35) 0%, rgba(0,0,0,0) 70%); pointer-events: none; }
     .bg-light-2 { position: absolute; top: 120px; right: -80px; width: 260px; height: 260px; background: radial-gradient(circle, rgba(245,158,11,0.2) 0%, rgba(0,0,0,0) 70%); pointer-events: none; }
     .bg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
 
-    /* 头部设计 */
+    /* 头部设计与 Logo 区域 */
     .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 15px; }
-    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: linear-gradient(90deg, rgba(245,158,11,0.2) 0%, rgba(59,130,246,0.2) 100%); border: 1px solid rgba(245,158,11,0.4); border-radius: 20px; font-size: 11px; font-weight: 700; color: #fbbf24; letter-spacing: 2px; margin-bottom: 10px; }
+    
+    /* 核心修改：Logo 样式控制 */
+    .brand-logo-container { margin-bottom: 12px; display: flex; justify-content: center; align-items: center; }
+    .brand-logo { max-height: 45px; max-width: 180px; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: linear-gradient(90deg, rgba(245,158,11,0.2) 0%, rgba(59,130,246,0.2) 100%); border: 1px solid rgba(245,158,11,0.4); border-radius: 20px; font-size: 11px; font-weight: 700; color: #fbbf24; letter-spacing: 2px; margin-bottom: 8px; }
     .poster-title { font-size: 30px; font-weight: 900; letter-spacing: 2px; background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
     .poster-date { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; color: #38bdf8; margin-top: 4px; letter-spacing: 2px; }
 
     /* 榜单列表区 */
     .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; margin-top: 5px; }
     
-    /* 基础卡片 */
-    .rank-item { 
-      display: flex; 
-      align-items: center; 
-      padding: 10px 16px; 
-      background: rgba(22, 29, 45, 0.7); 
-      border: 1px solid rgba(255, 255, 255, 0.06); 
-      backdrop-filter: blur(12px); 
-      border-radius: 10px; 
-      position: relative;
-    }
-    
-    /* 前三名专属豪华高亮 */
-    .top-1 { 
-      background: linear-gradient(90deg, rgba(245,158,11,0.2) 0%, rgba(22,29,45,0.8) 100%); 
-      border: 1px solid rgba(245,158,11,0.6); 
-      box-shadow: 0 4px 20px rgba(245,158,11,0.15);
-      padding: 14px 16px;
-    }
-    .top-2 { 
-      background: linear-gradient(90deg, rgba(148,163,184,0.18) 0%, rgba(22,29,45,0.8) 100%); 
-      border: 1px solid rgba(148,163,184,0.5); 
-    }
-    .top-3 { 
-      background: linear-gradient(90deg, rgba(217,119,6,0.18) 0%, rgba(22,29,45,0.8) 100%); 
-      border: 1px solid rgba(217,119,6,0.5); 
-    }
+    /* 卡片 */
+    .rank-item { display: flex; align-items: center; padding: 10px 16px; background: rgba(22, 29, 45, 0.7); border: 1px solid rgba(255, 255, 255, 0.06); backdrop-filter: blur(12px); border-radius: 10px; position: relative; }
+    .top-1 { background: linear-gradient(90deg, rgba(245,158,11,0.2) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(245,158,11,0.6); box-shadow: 0 4px 20px rgba(245,158,11,0.15); padding: 14px 16px; }
+    .top-2 { background: linear-gradient(90deg, rgba(148,163,184,0.18) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(148,163,184,0.5); }
+    .top-3 { background: linear-gradient(90deg, rgba(217,119,6,0.18) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(217,119,6,0.5); }
 
     /* 序号徽章 */
-    .rank-badge {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 15px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.05);
-      color: #64748b;
-    }
+    .rank-badge { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 15px; border-radius: 8px; background: rgba(255,255,255,0.05); color: #64748b; }
     .top-1 .rank-badge { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #000; box-shadow: 0 2px 8px rgba(251,191,36,0.4); font-size: 16px; }
     .top-2 .rank-badge { background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%); color: #000; }
     .top-3 .rank-badge { background: linear-gradient(135deg, #f97316 0%, #c2410c 100%); color: #fff; }
@@ -103,12 +74,10 @@
     .rank-name { font-size: 15px; font-weight: 700; flex: 1; margin-left: 14px; color: #f8fafc; letter-spacing: 0.5px; }
     .top-1 .rank-name { font-size: 17px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3); }
 
-    /* 数字凸显 */
     .rank-count { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #38bdf8; text-shadow: 0 0 8px rgba(56,189,248,0.3); }
     .top-1 .rank-count { font-size: 24px; color: #fbbf24; text-shadow: 0 0 12px rgba(251,191,36,0.4); }
     .rank-count span { font-size: 11px; font-weight: 500; color: #94a3b8; font-family: 'Noto Sans SC', sans-serif; margin-left: 2px; }
 
-    /* 底部发光装饰线条与标语 */
     .poster-footer { z-index: 2; text-align: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 5px; }
     .slogan { font-size: 12px; font-weight: 700; color: #38bdf8; letter-spacing: 2px; }
     .footer-tips { font-size: 10px; color: #475569; margin-top: 4px; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; }
@@ -127,7 +96,7 @@
     <div class="form-group">
       <label>批量粘贴 Excel 数据（姓名 跑店数）</label>
       <textarea id="input-raw-data" rows="8" placeholder="例如：&#10;张伟 18&#10;李娜 15&#10;王强 12&#10;刘洋 10&#10;陈杰 8"></textarea>
-      <div class="help-text">💡 提示：从 Excel 直接选中“姓名”和“数量”两列复制粘贴即可，系统会自动由高到低排序！</div>
+      <div class="help-text">💡 提示：支持直接粘贴 Excel 数据，自动从高到低排序。</div>
     </div>
 
     <button class="btn btn-primary" onclick="updatePoster()">🔄 生成高保真预览</button>
@@ -141,6 +110,10 @@
       <div class="bg-grid"></div>
 
       <div class="poster-header">
+        <div class="brand-logo-container">
+          <img src="logo.png" alt="Brand Logo" class="brand-logo" id="logo-img" onerror="this.style.display='none'">
+        </div>
+
         <div class="badge">👑 DAILY TOP PERFORMERS</div>
         <div class="poster-title">跑店英雄榜</div>
         <div class="poster-date" id="display-date">2026.08.07</div>
@@ -157,15 +130,12 @@
   </div>
 
   <script>
-    // 默认示例数据
     document.getElementById('input-raw-data').value = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6";
 
     function updatePoster() {
-      // 1. 更新日期
       const dateVal = document.getElementById('input-date').value;
       document.getElementById('display-date').innerText = dateVal;
 
-      // 2. 解析文本
       const rawText = document.getElementById('input-raw-data').value.trim();
       if (!rawText) return;
 
@@ -181,13 +151,9 @@
         }
       });
 
-      // 按跑店数由高到低排序
       listData.sort((a, b) => b.count - a.count);
-
-      // 最多展示前 7 名
       listData = listData.slice(0, 7);
 
-      // 3. 渲染列表
       const container = document.getElementById('rank-container');
       container.innerHTML = '';
 
@@ -213,7 +179,7 @@
       const posterElement = document.getElementById('poster');
       
       html2canvas(posterElement, {
-        scale: 3, // 3倍图超高清渲染
+        scale: 3,
         useCORS: true,
         backgroundColor: null
       }).then(canvas => {
@@ -225,7 +191,6 @@
       });
     }
 
-    // 页面载入自动运行
     window.onload = updatePoster;
   </script>
 </body>
