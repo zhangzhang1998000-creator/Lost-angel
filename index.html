@@ -44,8 +44,7 @@
       box-shadow: 0 0 30px rgba(228, 0, 117, 0.2);
     }
 
-    /* 丰富背景装饰层 */
-    /* 上传图片时自动开启的暗色遮罩保护层 */
+    /* 背景装饰层 */
     .bg-overlay { position: absolute; inset: 0; background: rgba(9, 3, 12, 0.75); pointer-events: none; z-index: 1; display: none; }
     .bg-light-1 { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 360px; height: 360px; background: radial-gradient(circle, rgba(228,0,117,0.35) 0%, rgba(0,0,0,0) 70%); pointer-events: none; z-index: 1; }
     .bg-light-2 { position: absolute; bottom: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(147,51,234,0.2) 0%, rgba(0,0,0,0) 70%); pointer-events: none; z-index: 1; }
@@ -58,34 +57,42 @@
     .brand-logo-container { margin-bottom: 12px; display: flex; justify-content: center; align-items: center; min-height: 70px; }
     .brand-logo { max-height: 80px; max-width: 240px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(228, 0, 117, 0.6)); }
 
-    /* 黑粉发光标签与标题 */
+    /* 兼容 html2canvas 的标题与标签样式 */
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); }
-    .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; background: linear-gradient(180deg, #ffffff 30%, #e40075 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 20px rgba(228, 0, 117, 0.5); }
+    
+    /* 改用实体高亮粉色 + 文本阴影，完全解决白盒遮挡问题 */
+    .poster-title { 
+      font-size: 32px; 
+      font-weight: 900; 
+      letter-spacing: 4px; 
+      color: #ffffff; 
+      text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075;
+    }
 
     /* 榜单列表区 */
     .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; margin-top: 10px; margin-bottom: 20px; }
     
-    /* 列表卡片结构 */
-    .rank-item { display: flex; align-items: center; padding: 10px 16px; background: rgba(20, 10, 28, 0.75); border: 1px solid rgba(228, 0, 117, 0.2); backdrop-filter: blur(10px); border-radius: 10px; position: relative; }
-    .top-1 { background: linear-gradient(90deg, rgba(228,0,117,0.35) 0%, rgba(20,10,28,0.9) 100%); border: 1px solid #e40075; box-shadow: 0 0 20px rgba(228, 0, 117, 0.4); padding: 13px 16px; }
-    .top-2 { background: linear-gradient(90deg, rgba(228,0,117,0.18) 0%, rgba(20,10,28,0.85) 100%); border: 1px solid rgba(228, 0, 117, 0.6); }
-    .top-3 { background: linear-gradient(90deg, rgba(228,0,117,0.12) 0%, rgba(20,10,28,0.85) 100%); border: 1px solid rgba(228, 0, 117, 0.4); }
+    /* 摒弃 backdrop-filter 毛玻璃，改用兼容性极佳的纯色不透明卡片 */
+    .rank-item { display: flex; align-items: center; padding: 10px 16px; background: #160a1d; border: 1px solid rgba(228, 0, 117, 0.3); border-radius: 10px; position: relative; }
+    .top-1 { background: #2d0520; border: 1px solid #e40075; box-shadow: 0 0 15px rgba(228, 0, 117, 0.5); padding: 13px 16px; }
+    .top-2 { background: #22071a; border: 1px solid rgba(228, 0, 117, 0.7); }
+    .top-3 { background: #1b0816; border: 1px solid rgba(228, 0, 117, 0.5); }
 
-    .rank-badge { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 15px; border-radius: 8px; background: rgba(255,255,255,0.05); color: #8b8b9e; }
-    .top-1 .rank-badge { background: linear-gradient(135deg, #e40075 0%, #ff66b3 100%); color: #fff; box-shadow: 0 0 12px rgba(228, 0, 117, 0.8); }
-    .top-2 .rank-badge { background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%); color: #000; }
-    .top-3 .rank-badge { background: rgba(228, 0, 117, 0.3); color: #ff66b3; border: 1px solid #e40075; }
+    .rank-badge { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 15px; border-radius: 8px; background: rgba(255,255,255,0.08); color: #8b8b9e; }
+    .top-1 .rank-badge { background: #e40075; color: #fff; box-shadow: 0 0 10px #e40075; }
+    .top-2 .rank-badge { background: #ffffff; color: #000; }
+    .top-3 .rank-badge { background: rgba(228, 0, 117, 0.4); color: #ff66b3; border: 1px solid #e40075; }
 
     .rank-name { font-size: 15px; font-weight: 700; flex: 1; margin-left: 14px; color: #f8fafc; }
-    .top-1 .rank-name { font-size: 17px; color: #fff; text-shadow: 0 0 8px rgba(228, 0, 117, 0.6); }
+    .top-1 .rank-name { font-size: 17px; color: #fff; text-shadow: 0 0 8px #e40075; }
 
-    .rank-count { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #ff66b3; text-shadow: 0 0 8px rgba(228,0,117,0.4); }
-    .top-1 .rank-count { font-size: 24px; color: #ffffff; text-shadow: 0 0 12px #e40075; }
+    .rank-count { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #ff66b3; }
+    .top-1 .rank-count { font-size: 24px; color: #ffffff; text-shadow: 0 0 10px #e40075; }
     .rank-count span { font-size: 11px; font-weight: 500; color: #9ca3af; font-family: 'Noto Sans SC', sans-serif; margin-left: 2px; }
 
     /* 底部日期区域 */
     .poster-footer { z-index: 2; text-align: center; margin-top: auto; padding-top: 10px; }
-    .poster-date { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; background: rgba(228,0,117,0.08); display: inline-block; padding: 6px 22px; border-radius: 20px; border: 1px solid rgba(228,0,117,0.3); box-shadow: 0 0 10px rgba(228,0,117,0.2); }
+    .poster-date { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; background: rgba(228,0,117,0.1); display: inline-block; padding: 6px 22px; border-radius: 20px; border: 1px solid rgba(228,0,117,0.4); }
   </style>
 </head>
 <body>
@@ -96,7 +103,7 @@
     <div class="form-group">
       <label>自定义海报背景图（可选）</label>
       <input type="file" id="input-bg" accept="image/*" onchange="changeBg(event)">
-      <div class="help-text">💡 不上传则默认使用黑粉发光科技背景。点击可上传本地图片作为背景。</div>
+      <div class="help-text">💡 不上传则默认使用黑粉发光科技背景。</div>
     </div>
 
     <div class="form-group">
@@ -107,7 +114,6 @@
     <div class="form-group">
       <label>批量粘贴 Excel 数据（姓名 跑店数）</label>
       <textarea id="input-raw-data" rows="8" placeholder="例如：&#10;张伟 18&#10;李娜 15&#10;王强 12&#10;刘洋 10&#10;陈杰 8"></textarea>
-      <div class="help-text">💡 支持粘贴任意人数！系统自动排序并完全展示。</div>
     </div>
 
     <button class="btn btn-primary" onclick="updatePoster()">🔄 生成高保真预览</button>
@@ -143,7 +149,6 @@
   <script>
     document.getElementById('input-raw-data').value = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6\n周杰 5";
 
-    // 方案 B：本地图片实时读取并作为背景
     function changeBg(event) {
       const file = event.target.files[0];
       if (file) {
@@ -152,18 +157,16 @@
           const poster = document.getElementById('poster');
           const overlay = document.getElementById('bg-overlay');
           poster.style.backgroundImage = `url('${e.target.result}')`;
-          overlay.style.display = 'block'; // 启用防暗不清晰的保真遮罩层
+          overlay.style.display = 'block';
         };
         reader.readAsDataURL(file);
       }
     }
 
     function updatePoster() {
-      // 1. 更新日期
       const dateVal = document.getElementById('input-date').value;
       document.getElementById('display-date').innerText = dateVal;
 
-      // 2. 解析文本
       const rawText = document.getElementById('input-raw-data').value.trim();
       if (!rawText) return;
 
@@ -179,7 +182,6 @@
         }
       });
 
-      // 自动按跑店数量由高到低排序
       listData.sort((a, b) => b.count - a.count);
 
       const container = document.getElementById('rank-container');
@@ -203,18 +205,24 @@
       });
     }
 
+    // 优化后的极速无损导出函数
     function downloadPoster() {
       const posterElement = document.getElementById('poster');
-      html2canvas(posterElement, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: null
-      }).then(canvas => {
-        const link = document.createElement('a');
-        const dateVal = document.getElementById('input-date').value;
-        link.download = `黑粉风_跑店英雄榜_${dateVal}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+      
+      // 等待网络字体准备完毕再渲染，防止文字变形错位
+      document.fonts.ready.then(() => {
+        html2canvas(posterElement, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#09030c'
+        }).then(canvas => {
+          const link = document.createElement('a');
+          const dateVal = document.getElementById('input-date').value || '战报';
+          link.download = `黑粉战报_${dateVal}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        });
       });
     }
 
