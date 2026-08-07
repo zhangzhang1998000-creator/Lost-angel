@@ -25,18 +25,18 @@
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 海报主体结构 */
+    /* 海报主体结构 - 改为 min-height，高度自动包含所有内容 */
     #poster { 
       width: 420px; 
-      height: 780px; 
+      min-height: 720px; 
       background: #0d111a; 
       color: #fff; 
-      padding: 45px 24px 30px; 
+      padding: 35px 24px 30px; 
       position: relative; 
       overflow: hidden; 
       display: flex; 
       flex-direction: column; 
-      border-radius: 4px;
+      border-radius: 8px;
     }
 
     /* 背景装饰层 */
@@ -44,37 +44,37 @@
     .bg-light-2 { position: absolute; bottom: 50px; right: -80px; width: 260px; height: 260px; background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, rgba(0,0,0,0) 70%); pointer-events: none; }
     .bg-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
 
-    /* 头部 Logo 区域 - 已根据需求调大 */
-    .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 25px; }
-    .brand-logo-container { margin-bottom: 20px; display: flex; justify-content: center; align-items: center; min-height: 80px; }
-    .brand-logo { max-height: 85px; max-width: 260px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6)); }
+    /* 头部 Logo 区域 */
+    .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 20px; }
+    .brand-logo-container { margin-bottom: 12px; display: flex; justify-content: center; align-items: center; min-height: 70px; }
+    .brand-logo { max-height: 75px; max-width: 240px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6)); }
 
-    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); border-radius: 20px; font-size: 11px; font-weight: 700; color: #38bdf8; letter-spacing: 2px; margin-bottom: 12px; }
-    .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); border-radius: 20px; font-size: 11px; font-weight: 700; color: #38bdf8; letter-spacing: 2px; margin-bottom: 10px; }
+    .poster-title { font-size: 30px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    /* 榜单列表区 - 增加 margin-top 确保上方空间充足 */
-    .rank-list { flex: 1; display: flex; flex-direction: column; gap: 12px; z-index: 2; justify-content: flex-start; margin-top: 40px; }
+    /* 榜单列表区 */
+    .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; margin-top: 15px; margin-bottom: 20px; }
     
-    .rank-item { display: flex; align-items: center; padding: 12px 18px; background: rgba(22, 29, 45, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 12px; position: relative; }
-    .top-1 { background: linear-gradient(90deg, rgba(245,158,11,0.15) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(245,158,11,0.5); box-shadow: 0 4px 20px rgba(245,158,11,0.15); padding: 16px 18px; }
+    .rank-item { display: flex; align-items: center; padding: 10px 16px; background: rgba(22, 29, 45, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 10px; position: relative; }
+    .top-1 { background: linear-gradient(90deg, rgba(245,158,11,0.15) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(245,158,11,0.5); box-shadow: 0 4px 20px rgba(245,158,11,0.15); padding: 13px 16px; }
     .top-2 { background: linear-gradient(90deg, rgba(148,163,184,0.15) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(148,163,184,0.4); }
     .top-3 { background: linear-gradient(90deg, rgba(217,119,6,0.15) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(217,119,6,0.4); }
 
-    .rank-badge { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 16px; border-radius: 9px; background: rgba(255,255,255,0.05); color: #64748b; }
+    .rank-badge { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 15px; border-radius: 8px; background: rgba(255,255,255,0.05); color: #64748b; }
     .top-1 .rank-badge { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #000; box-shadow: 0 2px 8px rgba(251,191,36,0.4); }
     .top-2 .rank-badge { background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%); color: #000; }
     .top-3 .rank-badge { background: linear-gradient(135deg, #f97316 0%, #c2410c 100%); color: #fff; }
 
-    .rank-name { font-size: 16px; font-weight: 700; flex: 1; margin-left: 16px; color: #f8fafc; }
-    .top-1 .rank-name { font-size: 18px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+    .rank-name { font-size: 15px; font-weight: 700; flex: 1; margin-left: 14px; color: #f8fafc; }
+    .top-1 .rank-name { font-size: 17px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
 
-    .rank-count { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; color: #38bdf8; }
-    .top-1 .rank-count { font-size: 26px; color: #fbbf24; text-shadow: 0 0 12px rgba(251,191,36,0.3); }
+    .rank-count { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #38bdf8; }
+    .top-1 .rank-count { font-size: 24px; color: #fbbf24; text-shadow: 0 0 12px rgba(251,191,36,0.3); }
     .rank-count span { font-size: 11px; font-weight: 500; color: #94a3b8; font-family: 'Noto Sans SC', sans-serif; margin-left: 2px; }
 
-    /* 底部日期区域 - 已按照需求移至最下且清空无用文字 */
-    .poster-footer { z-index: 2; text-align: center; margin-top: auto; padding-top: 20px; }
-    .poster-date { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; color: #475569; letter-spacing: 3px; background: rgba(255,255,255,0.03); display: inline-block; padding: 6px 20px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
+    /* 底部日期区域 */
+    .poster-footer { z-index: 2; text-align: center; margin-top: auto; padding-top: 10px; }
+    .poster-date { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; color: #94a3b8; letter-spacing: 2px; background: rgba(255,255,255,0.04); display: inline-block; padding: 6px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
   </style>
 </head>
 <body>
@@ -90,7 +90,7 @@
     <div class="form-group">
       <label>批量粘贴 Excel 数据（姓名 跑店数）</label>
       <textarea id="input-raw-data" rows="8" placeholder="例如：&#10;张伟 18&#10;李娜 15&#10;王强 12&#10;刘洋 10&#10;陈杰 8"></textarea>
-      <div class="help-text">💡 提示：从 Excel 直接选中“姓名”和“数量”两列复制粘贴，自动按由高到低排序显示前7名。</div>
+      <div class="help-text">💡 提示：支持粘贴多条数据，系统会自动按跑店数高低排序展示。</div>
     </div>
 
     <button class="btn btn-primary" onclick="updatePoster()">🔄 生成高保真预览</button>
@@ -112,7 +112,7 @@
       </div>
 
       <div class="rank-list" id="rank-container">
-        </div>
+      </div>
 
       <div class="poster-footer">
         <div class="poster-date" id="display-date">2026.08.07</div>
@@ -121,14 +121,12 @@
   </div>
 
   <script>
-    document.getElementById('input-raw-data').value = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6";
+    document.getElementById('input-raw-data').value = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8";
 
     function updatePoster() {
-      // 1. 更新底部日期
       const dateVal = document.getElementById('input-date').value;
       document.getElementById('display-date').innerText = dateVal;
 
-      // 2. 解析数据
       const rawText = document.getElementById('input-raw-data').value.trim();
       if (!rawText) return;
 
@@ -145,7 +143,8 @@
       });
 
       listData.sort((a, b) => b.count - a.count);
-      listData = listData.slice(0, 7);
+      // 限制最多显示前 6 名，保证最佳海报比例
+      listData = listData.slice(0, 6);
 
       const container = document.getElementById('rank-container');
       container.innerHTML = '';
