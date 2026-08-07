@@ -5,125 +5,169 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>每日跑店排行榜生成器</title>
   <script src="https://cdn.bootcdn.net/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #4361ee;
+      --bg-color: #0f172a;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; display: flex; gap: 20px; padding: 20px; min-height: 100vh; }
+    body { font-family: 'Noto Sans SC', sans-serif; background: #0b0f19; color: #fff; display: flex; gap: 30px; padding: 30px; min-height: 100vh; }
     
     /* 左侧控制面板 */
-    .control-panel { width: 320px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .control-panel h2 { font-size: 18px; margin-bottom: 15px; color: #333; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
-    .form-group input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
-    .data-row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .data-row input { padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
-    .btn { width: 100%; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-    .btn-primary { background: #1890ff; color: #fff; }
-    .btn-success { background: #52c41a; color: #fff; }
+    .control-panel { width: 340px; background: #1e293b; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); height: fit-content; }
+    .control-panel h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #f8fafc; border-bottom: 2px solid #334155; padding-bottom: 10px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 6px; font-weight: 500; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; outline: none; font-size: 14px; transition: 0.3s; }
+    .form-group input:focus, .form-group textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.2); }
+    .help-text { font-size: 11px; color: #64748b; margin-top: 4px; }
+    .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; margin-top: 10px; font-size: 14px; transition: all 0.2s; }
+    .btn-primary { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #fff; box-shadow: 0 4px 12px rgba(79,70,229,0.4); }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,0.4); }
+    .btn-success:hover { opacity: 0.9; transform: translateY(-1px); }
 
     /* 右侧预览区 */
-    .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; overflow: auto; }
+    .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 海报排版 (标准手机比例: 375x667) */
-    #poster { width: 375px; height: 667px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: #fff; padding: 30px 20px; border-radius: 12px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .poster-header { text-align: center; margin-bottom: 25px; }
-    .poster-title { font-size: 26px; font-weight: 800; letter-spacing: 2px; color: #ffe600; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-    .poster-date { font-size: 12px; opacity: 0.8; margin-top: 5px; }
+    /* 海报主体 (标准手机端高保真画幅: 400x711) */
+    #poster { width: 400px; height: 711px; background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); color: #fff; padding: 35px 25px; border-radius: 0; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
     
-    /* 榜单列表 */
-    .rank-list { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 10px; padding: 10px; }
-    .rank-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .rank-item:last-child { border-bottom: none; }
-    .rank-num { font-size: 18px; font-weight: bold; width: 30px; }
-    .rank-num-1 { color: #ffd700; }
-    .rank-num-2 { color: #c0c0c0; }
-    .rank-num-3 { color: #b87333; }
-    .rank-name { font-size: 16px; font-weight: 500; flex: 1; margin-left: 10px; }
-    .rank-count { font-size: 18px; font-weight: bold; color: #4facfe; }
-    .rank-count span { font-size: 12px; font-weight: normal; color: #fff; margin-left: 2px; }
+    /* 背景装饰光效 */
+    .bg-glow { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 300px; height: 300px; background: radial-gradient(circle, rgba(99,102,241,0.3) 0%, rgba(0,0,0,0) 70%); pointer-events: none; }
+    
+    /* 标语与头部 */
+    .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 20px; }
+    .tag { display: inline-block; padding: 4px 12px; background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.4); border-radius: 20px; font-size: 11px; font-weight: 700; color: #818cf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .poster-title { font-size: 28px; font-weight: 900; letter-spacing: 1px; background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .poster-date { font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700; color: #64748b; margin-top: 4px; letter-spacing: 1px; }
+    
+    /* 榜单列表区 */
+    .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; }
+    .rank-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 12px; transition: 0.3s; }
+    
+    /* 前三名专属高亮样式 */
+    .rank-item.top-1 { background: linear-gradient(90deg, rgba(245,158,11,0.15) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(245,158,11,0.4); }
+    .rank-item.top-2 { background: linear-gradient(90deg, rgba(148,163,184,0.15) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(148,163,184,0.4); }
+    .rank-item.top-3 { background: linear-gradient(90deg, rgba(180,83,9,0.15) 0%, rgba(255,255,255,0.02) 100%); border-color: rgba(180,83,9,0.4); }
 
-    .poster-footer { position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; font-size: 11px; opacity: 0.6; }
+    .rank-num { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 900; width: 35px; text-align: center; }
+    .top-1 .rank-num { color: #fbbf24; text-shadow: 0 0 10px rgba(251,191,36,0.5); }
+    .top-2 .rank-num { color: #cbd5e1; }
+    .top-3 .rank-num { color: #d97706; }
+    .other .rank-num { color: #475569; font-size: 15px; }
+
+    .rank-name { font-size: 15px; font-weight: 700; flex: 1; margin-left: 10px; color: #f1f5f9; }
+    .rank-count { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; color: #38bdf8; }
+    .rank-count span { font-size: 11px; font-weight: 400; color: #94a3b8; font-family: 'Noto Sans SC', sans-serif; margin-left: 2px; }
+
+    /* 底部标注 */
+    .poster-footer { z-index: 2; text-align: center; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; margin-top: 10px; }
+    .slogan { font-size: 12px; font-weight: 700; color: #818cf8; letter-spacing: 1px; }
+    .footer-tips { font-size: 10px; color: #475569; margin-top: 3px; }
   </style>
 </head>
 <body>
 
   <div class="control-panel">
-    <h2>数据录入</h2>
+    <h2>⚙️ 榜单数据生成器</h2>
+    
     <div class="form-group">
       <label>榜单日期</label>
-      <input type="text" id="input-date" value="2026-08-07">
-    </div>
-    
-    <div id="data-inputs">
-      <label style="font-size:12px; color:#666;">排名 / 姓名 / 跑店数</label>
-      <div class="data-row"><input type="text" value="张伟" class="name"><input type="number" value="18" class="count"></div>
-      <div class="data-row"><input type="text" value="李娜" class="name"><input type="number" value="15" class="count"></div>
-      <div class="data-row"><input type="text" value="王强" class="name"><input type="number" value="12" class="count"></div>
-      <div class="data-row"><input type="text" value="刘洋" class="name"><input type="number" value="10" class="count"></div>
-      <div class="data-row"><input type="text" value="陈杰" class="name"><input type="number" value="8" class="count"></div>
+      <input type="text" id="input-date" value="2026.08.07">
     </div>
 
-    <button class="btn btn-primary" onclick="updatePoster()">更新预览</button>
-    <button class="btn btn-success" onclick="downloadPoster()">导出高清海报图片</button>
+    <div class="form-group">
+      <label>批量粘贴数据（名字 和 数字 换行即可）</label>
+      <textarea id="input-raw-data" rows="8" placeholder="支持直接从 Excel 复制两列粘贴进来，如：&#10;张伟	18&#10;李娜	15&#10;王强	12&#10;刘洋	10&#10;陈杰	8"></textarea>
+      <div class="help-text">提示：格式为“姓名 跑店数”，用空格或 Tab 隔开。数据会自动重新按高到低排序！</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="updatePoster()">🔄 立即生成预览</button>
+    <button class="btn btn-success" onclick="downloadPoster()">📸 导出高清海报图片</button>
   </div>
 
   <div class="preview-panel">
     <div id="poster">
+      <div class="bg-glow"></div>
+
       <div class="poster-header">
-        <div class="poster-title">🏆 每日跑店英雄榜</div>
-        <div class="poster-date" id="display-date">2026-08-07</div>
+        <div class="tag">Daily Leaderboard</div>
+        <div class="poster-title">跑店战报 · 英雄榜</div>
+        <div class="poster-date" id="display-date">2026.08.07</div>
       </div>
 
       <div class="rank-list" id="rank-container">
         </div>
 
       <div class="poster-footer">
-        数据截止今日 18:00 | 越努力越幸运 🚀
+        <div class="slogan">🔥 每一个脚印，都是突破的开始</div>
+        <div class="footer-tips">数据截止今日 18:00 | 内部实时战报</div>
       </div>
     </div>
   </div>
 
   <script>
-    // 初始化数据渲染
+    // 默认初始数据
+    const defaultData = "张伟\t18\n李娜\t15\n王强\t12\n刘洋\t10\n陈杰\t8\n赵敏\t6";
+    document.getElementById('input-raw-data').value = defaultData;
+
     function updatePoster() {
-      // 更新日期
+      // 1. 更新日期
       const dateVal = document.getElementById('input-date').value;
       document.getElementById('display-date').innerText = dateVal;
 
-      // 获取输入的表格数据
-      const names = document.querySelectorAll('.name');
-      const counts = document.querySelectorAll('.count');
+      // 2. 解析文本域的数据
+      const rawText = document.getElementById('input-raw-data').value.trim();
+      if (!rawText) return;
+
+      const lines = rawText.split('\n');
+      let listData = [];
+
+      lines.forEach(line => {
+        // 兼容空格、Tab分割
+        const parts = line.trim().split(/\s+/);
+        if (parts.length >= 2) {
+          const name = parts[0];
+          const count = parseInt(parts[1]) || 0;
+          listData.push({ name, count });
+        }
+      });
+
+      // 自动按照跑店数量从高到低排序
+      listData.sort((a, b) => b.count - a.count);
+
+      // 限制最多显示前 7 名，保证海报精致不超页
+      listData = listData.slice(0, 7);
+
+      // 3. 渲染页面
       const container = document.getElementById('rank-container');
-      
-      container.innerHTML = ''; // 清空重新渲染
+      container.innerHTML = '';
 
-      names.forEach((input, index) => {
-        const name = input.value || '未知';
-        const count = counts[index].value || 0;
+      listData.forEach((item, index) => {
         const rank = index + 1;
-
-        let rankClass = '';
-        if (rank === 1) rankClass = 'rank-num-1';
-        else if (rank === 2) rankClass = 'rank-num-2';
-        else if (rank === 3) rankClass = 'rank-num-3';
+        let topClass = 'other';
+        if (rank === 1) topClass = 'top-1';
+        else if (rank === 2) topClass = 'top-2';
+        else if (rank === 3) topClass = 'top-3';
 
         const itemHtml = `
-          <div class="rank-item">
-            <div class="rank-num ${rankClass}">NO.${rank}</div>
-            <div class="rank-name">${name}</div>
-            <div class="rank-count">${count} <span>家</span></div>
+          <div class="rank-item ${topClass}">
+            <div class="rank-num">${rank < 10 ? '0' + rank : rank}</div>
+            <div class="rank-name">${item.name}</div>
+            <div class="rank-count">${item.count} <span>家</span></div>
           </div>
         `;
         container.insertAdjacentHTML('beforeend', itemHtml);
       });
     }
 
-    // 将 HTML 海报转换为 PNG 图片并自动下载
     function downloadPoster() {
       const posterElement = document.getElementById('poster');
       
       html2canvas(posterElement, {
-        scale: 2, // 2倍图，保证导出的图片足够清晰
+        scale: 3, // 3倍高清渲染，保证手机看极其清晰
         useCORS: true,
         backgroundColor: null
       }).then(canvas => {
@@ -135,7 +179,7 @@
       });
     }
 
-    // 页面加载完成后自动渲染一次
+    // 初始化渲染
     window.onload = updatePoster;
   </script>
 </body>
