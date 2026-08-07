@@ -25,10 +25,10 @@
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 海报主体结构 - 改为 min-height，高度自动包含所有内容 */
+    /* 海报主体结构 - 采用 min-height 确保包含所有列表与底部日期 */
     #poster { 
       width: 420px; 
-      min-height: 720px; 
+      min-height: 700px; 
       background: #0d111a; 
       color: #fff; 
       padding: 35px 24px 30px; 
@@ -47,16 +47,17 @@
     /* 头部 Logo 区域 */
     .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 20px; }
     .brand-logo-container { margin-bottom: 12px; display: flex; justify-content: center; align-items: center; min-height: 70px; }
-    .brand-logo { max-height: 75px; max-width: 240px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6)); }
+    .brand-logo { max-height: 80px; max-width: 240px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.6)); }
 
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3); border-radius: 20px; font-size: 11px; font-weight: 700; color: #38bdf8; letter-spacing: 2px; margin-bottom: 10px; }
     .poster-title { font-size: 30px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
     /* 榜单列表区 */
-    .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; margin-top: 15px; margin-bottom: 20px; }
+    .rank-list { flex: 1; display: flex; flex-direction: column; gap: 8px; z-index: 2; justify-content: flex-start; margin-top: 10px; margin-bottom: 20px; }
     
+    /* 列表卡片结构 */
     .rank-item { display: flex; align-items: center; padding: 10px 16px; background: rgba(22, 29, 45, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 10px; position: relative; }
-    .top-1 { background: linear-gradient(90deg, rgba(245,158,11,0.15) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(245,158,11,0.5); box-shadow: 0 4px 20px rgba(245,158,11,0.15); padding: 13px 16px; }
+    .top-1 { background: linear-gradient(90deg, rgba(245,158,11,0.15) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(245,158,11,0.5); box-shadow: 0 4px 20px rgba(245,158,11,0.15); padding: 12px 16px; }
     .top-2 { background: linear-gradient(90deg, rgba(148,163,184,0.15) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(148,163,184,0.4); }
     .top-3 { background: linear-gradient(90deg, rgba(217,119,6,0.15) 0%, rgba(22,29,45,0.8) 100%); border: 1px solid rgba(217,119,6,0.4); }
 
@@ -89,8 +90,8 @@
 
     <div class="form-group">
       <label>批量粘贴 Excel 数据（姓名 跑店数）</label>
-      <textarea id="input-raw-data" rows="8" placeholder="例如：&#10;张伟 18&#10;李娜 15&#10;王强 12&#10;刘洋 10&#10;陈杰 8"></textarea>
-      <div class="help-text">💡 提示：支持粘贴多条数据，系统会自动按跑店数高低排序展示。</div>
+      <textarea id="input-raw-data" rows="10" placeholder="例如：&#10;张伟 18&#10;李娜 15&#10;王强 12&#10;刘洋 10&#10;陈杰 8"></textarea>
+      <div class="help-text">💡 提示：支持粘贴任意人数！会自动按跑店数高低排序并完全展示。</div>
     </div>
 
     <button class="btn btn-primary" onclick="updatePoster()">🔄 生成高保真预览</button>
@@ -121,12 +122,14 @@
   </div>
 
   <script>
-    document.getElementById('input-raw-data').value = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8";
+    document.getElementById('input-raw-data').value = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6\n周杰 5";
 
     function updatePoster() {
+      // 1. 更新日期
       const dateVal = document.getElementById('input-date').value;
       document.getElementById('display-date').innerText = dateVal;
 
+      // 2. 解析文本
       const rawText = document.getElementById('input-raw-data').value.trim();
       if (!rawText) return;
 
@@ -142,10 +145,10 @@
         }
       });
 
+      // 自动按跑店数量由高到低排序
       listData.sort((a, b) => b.count - a.count);
-      // 限制最多显示前 6 名，保证最佳海报比例
-      listData = listData.slice(0, 6);
 
+      // 不限制人数，完全保留所有人员数据
       const container = document.getElementById('rank-container');
       container.innerHTML = '';
 
