@@ -18,7 +18,6 @@
     .form-group input, .form-group textarea { width: 100%; padding: 10px 14px; background: #050308; border: 1px solid rgba(228,0,117,0.3); border-radius: 8px; color: #fff; outline: none; font-size: 13px; font-family: inherit; }
     .form-group input[type="file"] { padding: 8px 10px; cursor: pointer; }
     .form-group input:focus, .form-group textarea:focus { border-color: #e40075; box-shadow: 0 0 10px rgba(228, 0, 117, 0.4); }
-    .help-text { font-size: 11px; color: #9ca3af; margin-top: 4px; line-height: 1.4; }
     .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; margin-top: 10px; font-size: 14px; transition: all 0.2s; }
     .btn-primary { background: linear-gradient(135deg, #e40075 0%, #900048 100%); color: #fff; box-shadow: 0 4px 15px rgba(228,0,117,0.4); }
     .btn-success { background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,0.4); }
@@ -27,17 +26,13 @@
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 海报主体结构：彻底锁死背景与自适应规则 */
+    /* 核心修改：固定高度 820px，绝对不会因为人数变多而变长 */
     #poster { 
       width: 420px; 
-      height: auto;
-      min-height: 600px; 
+      height: 820px; 
       background-color: #09030c; 
-      background-size: 100% 100% !important; /* 强制完全平铺充满 */
-      background-repeat: no-repeat !important;
-      background-position: center top !important;
       color: #fff; 
-      padding: 35px 24px 30px; 
+      padding: 30px 24px 25px; 
       position: relative; 
       overflow: hidden; 
       display: flex; 
@@ -45,6 +40,17 @@
       border-radius: 12px;
       border: 1px solid rgba(228, 0, 117, 0.4);
       box-shadow: 0 0 30px rgba(228, 0, 117, 0.2);
+    }
+
+    /* 背景图绝对居中覆盖 */
+    .custom-bg-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      display: none;
     }
 
     /* 背景装饰层 */
@@ -55,37 +61,91 @@
     .bg-lines { position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(228, 0, 117, 0.02) 15px, rgba(228, 0, 117, 0.02) 16px); pointer-events: none; z-index: 1; }
     .corner-dec-top { position: absolute; top: 12px; left: 12px; right: 12px; height: 2px; background: linear-gradient(90deg, #e40075, transparent, #e40075); opacity: 0.6; z-index: 2; }
 
-    /* 头部 Logo 区域 */
-    .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 20px; }
-    .brand-logo-container { margin-bottom: 12px; display: flex; justify-content: center; align-items: center; min-height: 70px; }
-    .brand-logo { max-height: 80px; max-width: 240px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(228, 0, 117, 0.6)); }
+    /* 头部 Header */
+    .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 12px; flex-shrink: 0; }
+    .brand-logo-container { margin-bottom: 8px; display: flex; justify-content: center; align-items: center; min-height: 60px; }
+    .brand-logo { max-height: 65px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(228, 0, 117, 0.6)); }
 
-    /* 标题与标签 */
-    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); text-transform: uppercase; }
-    .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075; word-break: break-word; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 14px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 6px; box-shadow: 0 0 10px rgba(228,0,117,0.3); text-transform: uppercase; }
+    
+    .poster-title { 
+      font-size: 28px; 
+      font-weight: 900; 
+      letter-spacing: 3px; 
+      color: #ff3399; 
+      filter: drop-shadow(0px 0px 8px #e40075);
+      word-break: break-word; 
+    }
 
-    /* 榜单列表区 */
-    .rank-list { display: flex; flex-direction: column; gap: 10px; z-index: 2; margin-top: 10px; margin-bottom: 25px; }
-    .rank-item { display: flex; align-items: center; padding: 10px 16px; background: #160a1d; border: 1px solid rgba(228, 0, 117, 0.3); border-radius: 10px; position: relative; }
-    .top-1 { background: #2d0520; border: 1px solid #e40075; box-shadow: 0 0 15px rgba(228, 0, 117, 0.5); padding: 13px 16px; }
+    /* 榜单容器：固定在剩余区域内，使用 CSS 变量控制卡片高度和间距 */
+    .rank-list { 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      gap: var(--item-gap, 8px); 
+      z-index: 2; 
+      justify-content: flex-start;
+      overflow: hidden;
+    }
+
+    .rank-item { 
+      display: flex; 
+      align-items: center; 
+      padding: var(--item-padding, 8px 14px); 
+      background: #160a1d; 
+      border: 1px solid rgba(228, 0, 117, 0.3); 
+      border-radius: 8px; 
+      position: relative; 
+      flex-shrink: 0;
+    }
+
+    .top-1 { background: #2d0520; border: 1px solid #e40075; box-shadow: 0 0 12px rgba(228, 0, 117, 0.5); }
     .top-2 { background: #22071a; border: 1px solid rgba(228, 0, 117, 0.7); }
     .top-3 { background: #1b0816; border: 1px solid rgba(228, 0, 117, 0.5); }
 
-    .rank-badge { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 15px; border-radius: 8px; background: rgba(255,255,255,0.08); color: #8b8b9e; }
+    .rank-badge { 
+      width: var(--badge-size, 30px); 
+      height: var(--badge-size, 30px); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-family: 'Orbitron', sans-serif; 
+      font-weight: 900; 
+      font-size: var(--badge-font, 14px); 
+      border-radius: 6px; 
+      background: rgba(255,255,255,0.08); 
+      color: #8b8b9e; 
+      flex-shrink: 0;
+    }
     .top-1 .rank-badge { background: #e40075; color: #fff; box-shadow: 0 0 10px #e40075; }
     .top-2 .rank-badge { background: #ffffff; color: #000; }
     .top-3 .rank-badge { background: rgba(228, 0, 117, 0.4); color: #ff66b3; border: 1px solid #e40075; }
 
-    .rank-name { font-size: 15px; font-weight: 700; flex: 1; margin-left: 14px; color: #f8fafc; }
-    .top-1 .rank-name { font-size: 17px; color: #fff; text-shadow: 0 0 8px #e40075; }
+    .rank-name { 
+      font-size: var(--name-font, 14px); 
+      font-weight: 700; 
+      flex: 1; 
+      margin-left: 12px; 
+      color: #f8fafc; 
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .top-1 .rank-name { color: #fff; filter: drop-shadow(0 0 5px #e40075); }
 
-    .rank-count { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #ff66b3; }
-    .top-1 .rank-count { font-size: 24px; color: #ffffff; text-shadow: 0 0 10px #e40075; }
-    .rank-count span { font-size: 11px; font-weight: 500; color: #9ca3af; font-family: 'Noto Sans SC', sans-serif; margin-left: 2px; }
+    .rank-count { 
+      font-family: 'Orbitron', sans-serif; 
+      font-size: var(--count-font, 18px); 
+      font-weight: 900; 
+      color: #ff66b3; 
+      flex-shrink: 0;
+    }
+    .top-1 .rank-count { color: #ffffff; filter: drop-shadow(0 0 8px #e40075); }
+    .rank-count span { font-size: var(--unit-font, 11px); font-weight: 500; color: #9ca3af; font-family: 'Noto Sans SC', sans-serif; margin-left: 2px; }
 
-    /* 底部日期区域 */
-    .poster-footer { z-index: 2; text-align: center; margin-top: auto; padding-top: 10px; }
-    .poster-date { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; background: rgba(228,0,117,0.1); display: inline-block; padding: 6px 22px; border-radius: 20px; border: 1px solid rgba(228,0,117,0.4); }
+    /* 底部 Date Footer */
+    .poster-footer { z-index: 2; text-align: center; margin-top: auto; padding-top: 10px; flex-shrink: 0; }
+    .poster-date { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; background: rgba(228,0,117,0.1); display: inline-block; padding: 5px 20px; border-radius: 20px; border: 1px solid rgba(228,0,117,0.4); }
   </style>
 </head>
 <body>
@@ -125,6 +185,8 @@
 
   <div class="preview-panel">
     <div id="poster">
+      <img id="custom-bg-img" class="custom-bg-layer" src="" alt="bg">
+
       <div class="bg-overlay" id="bg-overlay"></div>
       <div class="bg-light-1"></div>
       <div class="bg-light-2"></div>
@@ -201,17 +263,19 @@
     }
 
     function applyBgImage(imgUrl) {
-      const poster = document.getElementById('poster');
+      const bgImg = document.getElementById('custom-bg-img');
       const overlay = document.getElementById('bg-overlay');
-      poster.style.backgroundImage = `url('${imgUrl}')`;
+      bgImg.src = imgUrl;
+      bgImg.style.display = 'block';
       overlay.style.display = 'block';
     }
 
     function clearBg() {
       localStorage.removeItem('poster_bg_image');
-      const poster = document.getElementById('poster');
+      const bgImg = document.getElementById('custom-bg-img');
       const overlay = document.getElementById('bg-overlay');
-      poster.style.backgroundImage = 'none';
+      bgImg.src = '';
+      bgImg.style.display = 'none';
       overlay.style.display = 'none';
       document.getElementById('input-bg').value = '';
     }
@@ -242,8 +306,53 @@
 
       listData.sort((a, b) => b.count - a.count);
 
-      const container = document.getElementById('rank-container');
-      container.innerHTML = '';
+      const count = listData.length;
+      const rankListContainer = document.getElementById('rank-container');
+
+      // 动态计算算法：根据总人数自动压缩尺寸
+      let itemGap = 10;
+      let itemPadding = "10px 16px";
+      let badgeSize = 32;
+      let badgeFont = 15;
+      let nameFont = 15;
+      let countFont = 20;
+      let unitFont = 11;
+
+      if (count > 8 && count <= 10) {
+        itemGap = 7;
+        itemPadding = "8px 14px";
+        badgeSize = 28;
+        badgeFont = 13;
+        nameFont = 13;
+        countFont = 18;
+      } else if (count > 10 && count <= 15) {
+        itemGap = 5;
+        itemPadding = "5px 12px";
+        badgeSize = 24;
+        badgeFont = 12;
+        nameFont = 12;
+        countFont = 16;
+        unitFont = 10;
+      } else if (count > 15) {
+        itemGap = 3;
+        itemPadding = "3px 10px";
+        badgeSize = 20;
+        badgeFont = 11;
+        nameFont = 11;
+        countFont = 14;
+        unitFont = 9;
+      }
+
+      // 注入计算出的 CSS 变量
+      rankListContainer.style.setProperty('--item-gap', `${itemGap}px`);
+      rankListContainer.style.setProperty('--item-padding', itemPadding);
+      rankListContainer.style.setProperty('--badge-size', `${badgeSize}px`);
+      rankListContainer.style.setProperty('--badge-font', `${badgeFont}px`);
+      rankListContainer.style.setProperty('--name-font', `${nameFont}px`);
+      rankListContainer.style.setProperty('--count-font', `${countFont}px`);
+      rankListContainer.style.setProperty('--unit-font', `${unitFont}px`);
+
+      rankListContainer.innerHTML = '';
 
       listData.forEach((item, index) => {
         const rank = index + 1;
@@ -259,35 +368,21 @@
             <div class="rank-count">${item.count} <span>家</span></div>
           </div>
         `;
-        container.insertAdjacentHTML('beforeend', itemHtml);
+        rankListContainer.insertAdjacentHTML('beforeend', itemHtml);
       });
     }
 
-    // 完美解决导出与预览不一致问题的算法逻辑
     function downloadPoster() {
       const posterElement = document.getElementById('poster');
       
-      // 预先等待所有自定义字体与图片彻底装载
       document.fonts.ready.then(() => {
-        // 使用 window.scrollTo(0,0) 防止页面被滚动时导致截屏偏移
         window.scrollTo(0, 0);
 
         html2canvas(posterElement, {
-          scale: 2,                 // 2倍高清输出
-          useCORS: true,            // 允许跨域图片渲染
+          scale: 3,
+          useCORS: true,
           allowTaint: true,
-          logging: false,
-          width: posterElement.offsetWidth,
-          height: posterElement.offsetHeight,
-          backgroundColor: '#09030c',
-          onclone: (clonedDoc) => {
-            // 在克隆节点中强制锁死背景渲染表现，消除由于渲染库解析 CSS 产生的偏差
-            const clonedPoster = clonedDoc.getElementById('poster');
-            if (clonedPoster) {
-              clonedPoster.style.transform = 'none';
-              clonedPoster.style.boxShadow = 'none';
-            }
-          }
+          backgroundColor: '#09030c'
         }).then(canvas => {
           const link = document.createElement('a');
           const titleVal = document.getElementById('input-title').value || '战报';
