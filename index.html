@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>每日跑店排行榜生成器 - 终极无拉伸版</title>
+  <title>每日跑店排行榜生成器 - 放大字号高清导出版</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
@@ -26,7 +26,7 @@
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 核心海报容器（硬性设定尺寸） */
+    /* 核心海报容器 */
     #poster { 
       width: 420px; 
       height: 840px; 
@@ -336,25 +336,27 @@
       const isDoubleColumn = totalCount > 8;
 
       if (isDoubleColumn) {
+        // 放大后的双排尺寸配置
         rankListContainer.style.setProperty('--grid-columns', '1fr 1fr');
         rankListContainer.style.setProperty('--top3-gap', '6px');
-        rankListContainer.style.setProperty('--other-gap', '5px');
-        rankListContainer.style.setProperty('--item-padding', '5px 8px');
-        rankListContainer.style.setProperty('--badge-size', '22px');
-        rankListContainer.style.setProperty('--badge-font', '12px');
-        rankListContainer.style.setProperty('--name-font', '12px');
-        rankListContainer.style.setProperty('--count-font', '14px');
-        rankListContainer.style.setProperty('--unit-font', '10px');
+        rankListContainer.style.setProperty('--other-gap', '6px');
+        rankListContainer.style.setProperty('--item-padding', '7px 10px'); // 适当加大高度
+        rankListContainer.style.setProperty('--badge-size', '26px');      // 序号背景框变大
+        rankListContainer.style.setProperty('--badge-font', '13px');
+        rankListContainer.style.setProperty('--name-font', '14px');       // 名字字号调大到 14px
+        rankListContainer.style.setProperty('--count-font', '18px');      // 数字调大到 18px
+        rankListContainer.style.setProperty('--unit-font', '11px');       // 单位“家”字号
       } else {
+        // 单排模式配置
         rankListContainer.style.setProperty('--grid-columns', '1fr');
         rankListContainer.style.setProperty('--top3-gap', '8px');
         rankListContainer.style.setProperty('--other-gap', '8px');
         rankListContainer.style.setProperty('--item-padding', '10px 14px');
         rankListContainer.style.setProperty('--badge-size', '30px');
         rankListContainer.style.setProperty('--badge-font', '14px');
-        rankListContainer.style.setProperty('--name-font', '14px');
-        rankListContainer.style.setProperty('--count-font', '18px');
-        rankListContainer.style.setProperty('--unit-font', '11px');
+        rankListContainer.style.setProperty('--name-font', '15px');
+        rankListContainer.style.setProperty('--count-font', '20px');
+        rankListContainer.style.setProperty('--unit-font', '12px');
       }
 
       listData.forEach((item, index) => {
@@ -380,11 +382,10 @@
       });
     }
 
-    // 终极方案：基于 dom-to-image 的 100% 精确高清导出
+    // 导出门函数
     function downloadPoster() {
       const node = document.getElementById('poster');
       
-      // 使用 dom-to-image 保持 2 倍物理像素高清导出
       const scale = 2;
       const param = {
         width: node.offsetWidth * scale,
