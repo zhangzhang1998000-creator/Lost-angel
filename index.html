@@ -59,7 +59,7 @@
     .brand-logo { max-height: 80px; max-width: 240px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(228, 0, 117, 0.6)); }
 
     /* 标题与标签 */
-    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); text-transform: uppercase; }
     .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075; word-break: break-word; }
 
     /* 榜单列表区 */
@@ -90,6 +90,11 @@
 
   <div class="control-panel">
     <h2>⚡ 战报数据录入</h2>
+
+    <div class="form-group">
+      <label>顶部小标签（副标题）</label>
+      <input type="text" id="input-badge" value="🔥 TOP PERFORMERS" oninput="saveAndRender()">
+    </div>
 
     <div class="form-group">
       <label>海报主标题</label>
@@ -129,7 +134,7 @@
         <div class="brand-logo-container">
           <img src="logo.png" alt="Brand Logo" class="brand-logo" id="logo-img" onerror="this.style.display='none'">
         </div>
-        <div class="badge">🔥 TOP PERFORMERS</div>
+        <div class="badge" id="display-badge">🔥 TOP PERFORMERS</div>
         <div class="poster-title" id="display-title">跑店英雄榜</div>
       </div>
 
@@ -148,35 +153,41 @@
 
     // 页面加载完毕后自动读取缓存并渲染
     window.onload = function() {
-      // 1. 读取保存的主标题
+      // 1. 读取保存的英文副标题
+      const savedBadge = localStorage.getItem('poster_badge') || '🔥 TOP PERFORMERS';
+      document.getElementById('input-badge').value = savedBadge;
+
+      // 2. 读取保存的主标题
       const savedTitle = localStorage.getItem('poster_title') || '跑店英雄榜';
       document.getElementById('input-title').value = savedTitle;
 
-      // 2. 读取保存的日期
+      // 3. 读取保存的日期
       const savedDate = localStorage.getItem('poster_date') || '2026.08.07';
       document.getElementById('input-date').value = savedDate;
 
-      // 3. 读取保存的人员数据
+      // 4. 读取保存的人员数据
       const savedRawData = localStorage.getItem('poster_raw_data') || defaultData;
       document.getElementById('input-raw-data').value = savedRawData;
 
-      // 4. 读取保存的背景图
+      // 5. 读取保存的背景图
       const savedBg = localStorage.getItem('poster_bg_image');
       if (savedBg) {
         applyBgImage(savedBg);
       }
 
-      // 5. 渲染海报
+      // 6. 渲染海报
       updatePoster();
     };
 
     // 保存并实时渲染
     function saveAndRender() {
+      const badgeVal = document.getElementById('input-badge').value;
       const titleVal = document.getElementById('input-title').value;
       const dateVal = document.getElementById('input-date').value;
       const rawText = document.getElementById('input-raw-data').value;
 
       // 实时存入浏览器本地
+      localStorage.setItem('poster_badge', badgeVal);
       localStorage.setItem('poster_title', titleVal);
       localStorage.setItem('poster_date', dateVal);
       localStorage.setItem('poster_raw_data', rawText);
@@ -218,9 +229,12 @@
 
     // 渲染海报
     function updatePoster() {
-      // 更新标题与日期
+      // 更新副标题、主标题与日期
+      const badgeVal = document.getElementById('input-badge').value || '🔥 TOP PERFORMERS';
       const titleVal = document.getElementById('input-title').value || '跑店英雄榜';
       const dateVal = document.getElementById('input-date').value;
+      
+      document.getElementById('display-badge').innerText = badgeVal;
       document.getElementById('display-title').innerText = titleVal;
       document.getElementById('display-date').innerText = dateVal;
 
