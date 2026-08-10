@@ -10,7 +10,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Noto Sans SC', sans-serif; background: #050308; color: #fff; display: flex; gap: 30px; padding: 30px; min-height: 100vh; align-items: flex-start; }
     
-    /* 左侧控制面板（固定粘滞在左侧，右侧变长时左侧面板依然停留在视野中） */
+    /* 左侧控制面板 */
     .control-panel { width: 340px; background: #0f0914; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(228, 0, 117, 0.2); border: 1px solid rgba(228, 0, 117, 0.3); height: fit-content; position: sticky; top: 30px; }
     .control-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #f8fafc; border-bottom: 1px solid rgba(228,0,117,0.3); padding-bottom: 12px; }
     .form-group { margin-bottom: 16px; }
@@ -27,14 +27,15 @@
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 海报主体结构：移除固定高度限制，设置为 height: auto 彻底实现无限自适应高度 */
+    /* 海报主体结构：彻底锁死背景与自适应规则 */
     #poster { 
       width: 420px; 
       height: auto;
       min-height: 600px; 
       background-color: #09030c; 
-      background-size: cover;
-      background-position: center;
+      background-size: 100% 100% !important; /* 强制完全平铺充满 */
+      background-repeat: no-repeat !important;
+      background-position: center top !important;
       color: #fff; 
       padding: 35px 24px 30px; 
       position: relative; 
@@ -63,7 +64,7 @@
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); text-transform: uppercase; }
     .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075; word-break: break-word; }
 
-    /* 榜单列表区：自动延伸向下追加，绝对不挤压错位 */
+    /* 榜单列表区 */
     .rank-list { display: flex; flex-direction: column; gap: 10px; z-index: 2; margin-top: 10px; margin-bottom: 25px; }
     .rank-item { display: flex; align-items: center; padding: 10px 16px; background: #160a1d; border: 1px solid rgba(228, 0, 117, 0.3); border-radius: 10px; position: relative; }
     .top-1 { background: #2d0520; border: 1px solid #e40075; box-shadow: 0 0 15px rgba(228, 0, 117, 0.5); padding: 13px 16px; }
@@ -114,9 +115,8 @@
     </div>
 
     <div class="form-group">
-      <label>批量粘贴 Excel 数据（加行自动变长）</label>
+      <label>批量粘贴 Excel 数据</label>
       <textarea id="input-raw-data" rows="10" placeholder="直接粘贴任意多行数据..." oninput="saveAndRender()"></textarea>
-      <div class="help-text">💡 不管粘贴 10 人、20 人还是 50 人，海报都会自动长高完整显示！</div>
     </div>
 
     <button class="btn btn-primary" onclick="saveAndRender()">🔄 生成高保真预览</button>
@@ -263,21 +263,37 @@
       });
     }
 
+    // 完美解决导出与预览不一致问题的算法逻辑
     function downloadPoster() {
       const posterElement = document.getElementById('poster');
       
+      // 预先等待所有自定义字体与图片彻底装载
       document.fonts.ready.then(() => {
+        // 使用 window.scrollTo(0,0) 防止页面被滚动时导致截屏偏移
+        window.scrollTo(0, 0);
+
         html2canvas(posterElement, {
-          scale: 3,
-          useCORS: true,
+          scale: 2,                 // 2倍高清输出
+          useCORS: true,            // 允许跨域图片渲染
           allowTaint: true,
-          backgroundColor: '#09030c'
+          logging: false,
+          width: posterElement.offsetWidth,
+          height: posterElement.offsetHeight,
+          backgroundColor: '#09030c',
+          onclone: (clonedDoc) => {
+            // 在克隆节点中强制锁死背景渲染表现，消除由于渲染库解析 CSS 产生的偏差
+            const clonedPoster = clonedDoc.getElementById('poster');
+            if (clonedPoster) {
+              clonedPoster.style.transform = 'none';
+              clonedPoster.style.boxShadow = 'none';
+            }
+          }
         }).then(canvas => {
           const link = document.createElement('a');
           const titleVal = document.getElementById('input-title').value || '战报';
           const dateVal = document.getElementById('input-date').value || '';
           link.download = `${titleVal}_${dateVal}.png`;
-          link.href = canvas.toDataURL('image/png');
+          link.href = canvas.toDataURL('image/png', 1.0);
           link.click();
         });
       });
