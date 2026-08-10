@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>每日跑店排行榜生成器 - 分页海报版</title>
+  <title>每日跑店排行榜生成器 - 优化布局版</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
@@ -37,7 +37,7 @@
       height: 840px; 
       background-color: #09030c; 
       color: #fff; 
-      padding: 26px 20px 20px; 
+      padding: 24px 20px 20px; 
       position: relative; 
       overflow: hidden; 
       display: flex; 
@@ -56,40 +56,40 @@
     .bg-lines { position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(228, 0, 117, 0.02) 15px, rgba(228, 0, 117, 0.02) 16px); pointer-events: none; z-index: 1; }
     .corner-dec-top { position: absolute; top: 12px; left: 12px; right: 12px; height: 2px; background: linear-gradient(90deg, #e40075, transparent, #e40075); opacity: 0.6; z-index: 2; }
 
-    /* 头部 Header */
-    .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 12px; flex-shrink: 0; }
-    .brand-logo-container { margin-bottom: 4px; display: flex; justify-content: center; align-items: center; min-height: 45px; }
-    .brand-logo { max-height: 50px; max-width: 200px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(228, 0, 117, 0.6)); }
+    /* 头部 Header 放大并拉开间距 */
+    .poster-header { text-align: center; position: relative; z-index: 2; margin-bottom: 24px; flex-shrink: 0; }
+    .brand-logo-container { margin-bottom: 8px; display: flex; justify-content: center; align-items: center; min-height: 60px; }
+    .brand-logo { max-height: 65px; max-width: 220px; object-fit: contain; filter: drop-shadow(0 0 14px rgba(228, 0, 117, 0.7)); }
 
-    .badge-wrapper { display: flex; justify-content: center; margin-bottom: 6px; }
+    .badge-wrapper { display: flex; justify-content: center; margin-bottom: 8px; }
     .badge { 
-      display: inline-block; padding: 4px 14px; background: rgba(228, 0, 117, 0.15); 
+      display: inline-block; padding: 5px 16px; background: rgba(228, 0, 117, 0.15); 
       border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; 
       color: #ff66b3; letter-spacing: 2px; box-shadow: 0 0 10px rgba(228, 0, 117, 0.3); 
       text-transform: uppercase; white-space: nowrap; line-height: 1.2;
     }
-    .poster-title { font-size: 24px; font-weight: 900; letter-spacing: 2px; color: #ff3399; filter: drop-shadow(0px 0px 8px #e40075); }
+    .poster-title { font-size: 26px; font-weight: 900; letter-spacing: 2px; color: #ff3399; filter: drop-shadow(0px 0px 8px #e40075); }
 
-    /* 榜单主体 */
-    .rank-list { flex: 1; display: flex; flex-direction: column; gap: 7px; z-index: 2; justify-content: flex-start; overflow: hidden; }
+    /* 榜单主体下移与间距拉大 */
+    .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; overflow: hidden; }
 
     /* 表头 */
     .list-header {
-      display: flex; align-items: center; padding: 6px 12px; background: rgba(228, 0, 117, 0.1);
-      border: 1px solid rgba(228, 0, 117, 0.2); border-radius: 6px; font-size: 11px; font-weight: 700;
-      color: #ff66b3; gap: 6px; margin-bottom: 2px;
+      display: flex; align-items: center; padding: 7px 12px; background: rgba(228, 0, 117, 0.12);
+      border: 1px solid rgba(228, 0, 117, 0.25); border-radius: 6px; font-size: 11px; font-weight: 700;
+      color: #ff66b3; gap: 6px; margin-bottom: 4px;
     }
     .header-col-rank { width: 26px; text-align: center; flex-shrink: 0; }
     .header-col-name { width: 65px; flex-shrink: 0; }
     .header-col-stats { display: flex; flex: 1; justify-content: space-around; text-align: center; }
     .header-col-stats span { flex: 1; }
 
-    /* 单一容器展示当前页卡片 */
-    .page-items-container { display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
+    /* 单一容器展示当前页卡片（拉大卡片间距 gap） */
+    .page-items-container { display: flex; flex-direction: column; gap: 11px; flex-shrink: 0; }
 
-    /* 卡片通用样式 */
+    /* 卡片通用样式（增加 padding 填充空间） */
     .rank-item { 
-      display: flex; align-items: center; padding: 9px 12px; background: #160a1d; 
+      display: flex; align-items: center; padding: 10px 12px; background: #160a1d; 
       border: 1px solid rgba(228, 0, 117, 0.3); border-radius: 8px; position: relative; min-width: 0; gap: 6px;
     }
     .top-1 { background: #2d0520; border: 1px solid #e40075; box-shadow: 0 0 10px rgba(228, 0, 117, 0.4); }
@@ -115,9 +115,9 @@
     .top-1 .data-item.main-stat .val { color: #ffffff; filter: drop-shadow(0 0 8px #e40075); }
 
     /* 底部 Footer */
-    .poster-footer { z-index: 2; text-align: center; margin-top: auto; padding-top: 6px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; gap: 10px; }
-    .poster-date { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; background: rgba(228,0,117,0.1); padding: 3px 16px; border-radius: 20px; border: 1px solid rgba(228,0,117,0.4); }
-    .page-indicator { font-family: 'Orbitron', sans-serif; font-size: 10px; font-weight: 700; color: #8b8b9e; }
+    .poster-footer { z-index: 2; text-align: center; margin-top: auto; padding-top: 10px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; gap: 12px; }
+    .poster-date { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; background: rgba(228,0,117,0.1); padding: 4px 18px; border-radius: 20px; border: 1px solid rgba(228,0,117,0.4); }
+    .page-indicator { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 700; color: #8b8b9e; }
   </style>
 </head>
 <body>
@@ -205,9 +205,9 @@
   </div>
 
   <script>
-    const defaultData = "张伟 22 15 15\n李娜 18 13 10\n王强 15 10 5\n刘洋 12 8 4\n陈杰 10 7 3\n赵敏 9 6 2\n孙伟 8 5 1\n周杰 7 4 0\n王二 6 3 0\n张三 4 2 0\n李四 2 1 0";
+    const defaultData = "张伟 22 15 15\n李娜 18 13 10\n王强 15 10 10\n刘洋 12 0 0\n陈杰 10 0 0\n赵敏 9 0 0\n孙伟 8 0 0\n周杰 7 0 0\n王二 6 0 0\n张三 4 0 0\n李四 2 0 0";
     
-    const PAGE_SIZE = 8; // 每页显示 8 条，字号大、版面最舒服
+    const PAGE_SIZE = 8; // 每页固定 8 名
     let currentPage = 1;
     let totalPages = 1;
     let globalListData = [];
@@ -260,7 +260,7 @@
       // 排序
       globalListData.sort((a, b) => b.inStore - a.inStore);
 
-      // 计算连续并列排名 (Dense Rank)
+      // 计算连续并列排名
       let currentRank = 1;
       globalListData.forEach((item, index) => {
         if (index > 0 && item.inStore < globalListData[index - 1].inStore) {
@@ -287,7 +287,7 @@
       const itemsBox = document.getElementById('items-box');
       itemsBox.innerHTML = '';
 
-      // 获取当前页的数据切片
+      // 获取当前页切片数据
       const startIndex = (currentPage - 1) * PAGE_SIZE;
       const pageData = globalListData.slice(startIndex, startIndex + PAGE_SIZE);
 
@@ -383,18 +383,15 @@
       });
     }
 
-    // 导出当前页
     function downloadCurrentPage() {
       exportSingleNode(currentPage);
     }
 
-    // 批量导出所有页
     async function downloadAllPages() {
       const originalPage = currentPage;
       for (let i = 1; i <= totalPages; i++) {
         currentPage = i;
         renderPage();
-        // 延时等待 DOM 渲染完后捕获
         await new Promise(r => setTimeout(r, 200));
         await exportSingleNode(i);
       }
