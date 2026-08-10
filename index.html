@@ -8,10 +8,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Noto Sans SC', sans-serif; background: #050308; color: #fff; display: flex; gap: 30px; padding: 30px; min-height: 100vh; }
+    body { font-family: 'Noto Sans SC', sans-serif; background: #050308; color: #fff; display: flex; gap: 30px; padding: 30px; min-height: 100vh; align-items: flex-start; }
     
-    /* 左侧控制面板 */
-    .control-panel { width: 340px; background: #0f0914; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(228, 0, 117, 0.2); border: 1px solid rgba(228, 0, 117, 0.3); height: fit-content; }
+    /* 左侧控制面板（固定粘滞在左侧，右侧变长时左侧面板依然停留在视野中） */
+    .control-panel { width: 340px; background: #0f0914; padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(228, 0, 117, 0.2); border: 1px solid rgba(228, 0, 117, 0.3); height: fit-content; position: sticky; top: 30px; }
     .control-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: #f8fafc; border-bottom: 1px solid rgba(228,0,117,0.3); padding-bottom: 12px; }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; font-size: 13px; color: #d1d5db; margin-bottom: 6px; font-weight: 500; }
@@ -27,10 +27,11 @@
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 海报主体结构 */
+    /* 海报主体结构：移除固定高度限制，设置为 height: auto 彻底实现无限自适应高度 */
     #poster { 
       width: 420px; 
-      min-height: 720px; 
+      height: auto;
+      min-height: 600px; 
       background-color: #09030c; 
       background-size: cover;
       background-position: center;
@@ -62,8 +63,8 @@
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); text-transform: uppercase; }
     .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075; word-break: break-word; }
 
-    /* 榜单列表区 */
-    .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; margin-top: 10px; margin-bottom: 20px; }
+    /* 榜单列表区：自动延伸向下追加，绝对不挤压错位 */
+    .rank-list { display: flex; flex-direction: column; gap: 10px; z-index: 2; margin-top: 10px; margin-bottom: 25px; }
     .rank-item { display: flex; align-items: center; padding: 10px 16px; background: #160a1d; border: 1px solid rgba(228, 0, 117, 0.3); border-radius: 10px; position: relative; }
     .top-1 { background: #2d0520; border: 1px solid #e40075; box-shadow: 0 0 15px rgba(228, 0, 117, 0.5); padding: 13px 16px; }
     .top-2 { background: #22071a; border: 1px solid rgba(228, 0, 117, 0.7); }
@@ -113,8 +114,9 @@
     </div>
 
     <div class="form-group">
-      <label>批量粘贴 Excel 数据</label>
-      <textarea id="input-raw-data" rows="8" oninput="saveAndRender()"></textarea>
+      <label>批量粘贴 Excel 数据（加行自动变长）</label>
+      <textarea id="input-raw-data" rows="10" placeholder="直接粘贴任意多行数据..." oninput="saveAndRender()"></textarea>
+      <div class="help-text">💡 不管粘贴 10 人、20 人还是 50 人，海报都会自动长高完整显示！</div>
     </div>
 
     <button class="btn btn-primary" onclick="saveAndRender()">🔄 生成高保真预览</button>
@@ -148,45 +150,35 @@
   </div>
 
   <script>
-    // 默认初始数据
     const defaultData = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6\n周杰 5";
 
-    // 页面加载完毕后自动读取缓存并渲染
     window.onload = function() {
-      // 1. 读取保存的英文副标题
       const savedBadge = localStorage.getItem('poster_badge') || '🔥 TOP PERFORMERS';
       document.getElementById('input-badge').value = savedBadge;
 
-      // 2. 读取保存的主标题
       const savedTitle = localStorage.getItem('poster_title') || '跑店英雄榜';
       document.getElementById('input-title').value = savedTitle;
 
-      // 3. 读取保存的日期
       const savedDate = localStorage.getItem('poster_date') || '2026.08.07';
       document.getElementById('input-date').value = savedDate;
 
-      // 4. 读取保存的人员数据
       const savedRawData = localStorage.getItem('poster_raw_data') || defaultData;
       document.getElementById('input-raw-data').value = savedRawData;
 
-      // 5. 读取保存的背景图
       const savedBg = localStorage.getItem('poster_bg_image');
       if (savedBg) {
         applyBgImage(savedBg);
       }
 
-      // 6. 渲染海报
       updatePoster();
     };
 
-    // 保存并实时渲染
     function saveAndRender() {
       const badgeVal = document.getElementById('input-badge').value;
       const titleVal = document.getElementById('input-title').value;
       const dateVal = document.getElementById('input-date').value;
       const rawText = document.getElementById('input-raw-data').value;
 
-      // 实时存入浏览器本地
       localStorage.setItem('poster_badge', badgeVal);
       localStorage.setItem('poster_title', titleVal);
       localStorage.setItem('poster_date', dateVal);
@@ -195,7 +187,6 @@
       updatePoster();
     }
 
-    // 上传图片并保存到本地
     function changeBg(event) {
       const file = event.target.files[0];
       if (file) {
@@ -209,7 +200,6 @@
       }
     }
 
-    // 应用背景图片
     function applyBgImage(imgUrl) {
       const poster = document.getElementById('poster');
       const overlay = document.getElementById('bg-overlay');
@@ -217,7 +207,6 @@
       overlay.style.display = 'block';
     }
 
-    // 清除自定义背景
     function clearBg() {
       localStorage.removeItem('poster_bg_image');
       const poster = document.getElementById('poster');
@@ -227,9 +216,7 @@
       document.getElementById('input-bg').value = '';
     }
 
-    // 渲染海报
     function updatePoster() {
-      // 更新副标题、主标题与日期
       const badgeVal = document.getElementById('input-badge').value || '🔥 TOP PERFORMERS';
       const titleVal = document.getElementById('input-title').value || '跑店英雄榜';
       const dateVal = document.getElementById('input-date').value;
@@ -276,7 +263,6 @@
       });
     }
 
-    // 导出高清图片
     function downloadPoster() {
       const posterElement = document.getElementById('poster');
       
