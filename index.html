@@ -60,7 +60,7 @@
 
     /* 标题与标签 */
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); }
-    .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075; }
+    .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075; word-break: break-word; }
 
     /* 榜单列表区 */
     .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; margin-top: 10px; margin-bottom: 20px; }
@@ -90,9 +90,14 @@
 
   <div class="control-panel">
     <h2>⚡ 战报数据录入</h2>
+
+    <div class="form-group">
+      <label>海报主标题</label>
+      <input type="text" id="input-title" value="跑店英雄榜" oninput="saveAndRender()">
+    </div>
     
     <div class="form-group">
-      <label>自定义海报背景图（已支持自动记住）</label>
+      <label>自定义海报背景图</label>
       <input type="file" id="input-bg" accept="image/*" onchange="changeBg(event)">
       <button class="btn btn-danger" onclick="clearBg()">🗑️ 清除自定义背景</button>
     </div>
@@ -103,7 +108,7 @@
     </div>
 
     <div class="form-group">
-      <label>批量粘贴 Excel 数据（自动保存）</label>
+      <label>批量粘贴 Excel 数据</label>
       <textarea id="input-raw-data" rows="8" oninput="saveAndRender()"></textarea>
     </div>
 
@@ -125,7 +130,7 @@
           <img src="logo.png" alt="Brand Logo" class="brand-logo" id="logo-img" onerror="this.style.display='none'">
         </div>
         <div class="badge">🔥 TOP PERFORMERS</div>
-        <div class="poster-title">跑店英雄榜</div>
+        <div class="poster-title" id="display-title">跑店英雄榜</div>
       </div>
 
       <div class="rank-list" id="rank-container">
@@ -143,30 +148,36 @@
 
     // 页面加载完毕后自动读取缓存并渲染
     window.onload = function() {
-      // 1. 读取历史保存的日期
+      // 1. 读取保存的主标题
+      const savedTitle = localStorage.getItem('poster_title') || '跑店英雄榜';
+      document.getElementById('input-title').value = savedTitle;
+
+      // 2. 读取保存的日期
       const savedDate = localStorage.getItem('poster_date') || '2026.08.07';
       document.getElementById('input-date').value = savedDate;
 
-      // 2. 读取历史保存的人员数据
+      // 3. 读取保存的人员数据
       const savedRawData = localStorage.getItem('poster_raw_data') || defaultData;
       document.getElementById('input-raw-data').value = savedRawData;
 
-      // 3. 读取历史保存的背景图
+      // 4. 读取保存的背景图
       const savedBg = localStorage.getItem('poster_bg_image');
       if (savedBg) {
         applyBgImage(savedBg);
       }
 
-      // 4. 渲染海报
+      // 5. 渲染海报
       updatePoster();
     };
 
     // 保存并实时渲染
     function saveAndRender() {
+      const titleVal = document.getElementById('input-title').value;
       const dateVal = document.getElementById('input-date').value;
       const rawText = document.getElementById('input-raw-data').value;
 
-      // 实时保存到浏览器本地
+      // 实时存入浏览器本地
+      localStorage.setItem('poster_title', titleVal);
       localStorage.setItem('poster_date', dateVal);
       localStorage.setItem('poster_raw_data', rawText);
 
@@ -181,7 +192,6 @@
         reader.onload = function(e) {
           const imgBase64 = e.target.result;
           applyBgImage(imgBase64);
-          // 存入浏览器
           localStorage.setItem('poster_bg_image', imgBase64);
         };
         reader.readAsDataURL(file);
@@ -208,7 +218,10 @@
 
     // 渲染海报
     function updatePoster() {
+      // 更新标题与日期
+      const titleVal = document.getElementById('input-title').value || '跑店英雄榜';
       const dateVal = document.getElementById('input-date').value;
+      document.getElementById('display-title').innerText = titleVal;
       document.getElementById('display-date').innerText = dateVal;
 
       const rawText = document.getElementById('input-raw-data').value.trim();
@@ -249,7 +262,7 @@
       });
     }
 
-    // 导出高清晰图片
+    // 导出高清图片
     function downloadPoster() {
       const posterElement = document.getElementById('poster');
       
@@ -261,8 +274,9 @@
           backgroundColor: '#09030c'
         }).then(canvas => {
           const link = document.createElement('a');
-          const dateVal = document.getElementById('input-date').value || '战报';
-          link.download = `黑粉战报_${dateVal}.png`;
+          const titleVal = document.getElementById('input-title').value || '战报';
+          const dateVal = document.getElementById('input-date').value || '';
+          link.download = `${titleVal}_${dateVal}.png`;
           link.href = canvas.toDataURL('image/png');
           link.click();
         });
