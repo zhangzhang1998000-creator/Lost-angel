@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>每日跑店排行榜生成器 - 1:1完美导出稳定版</title>
-  <script src="https://cdn.bootcdn.net/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <title>每日跑店排行榜生成器 - 终极无拉伸版</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,7 +26,7 @@
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 核心海报容器 */
+    /* 核心海报容器（硬性设定尺寸） */
     #poster { 
       width: 420px; 
       height: 840px; 
@@ -42,7 +42,7 @@
       box-shadow: 0 0 30px rgba(228, 0, 117, 0.2);
     }
 
-    /* 背景图层：按框充满并保持原始裁切与比例 */
+    /* 背景图层 */
     .custom-bg-layer {
       position: absolute;
       top: 0;
@@ -54,7 +54,7 @@
       display: none;
     }
 
-    /* 内部装饰与光效 */
+    /* 背景光效与装饰 */
     .bg-overlay { position: absolute; inset: 0; background: rgba(9, 3, 12, 0.75); pointer-events: none; z-index: 1; display: none; }
     .bg-light-1 { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 360px; height: 360px; background: radial-gradient(circle, rgba(228,0,117,0.35) 0%, rgba(0,0,0,0) 70%); pointer-events: none; z-index: 1; }
     .bg-light-2 { position: absolute; bottom: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(147,51,234,0.2) 0%, rgba(0,0,0,0) 70%); pointer-events: none; z-index: 1; }
@@ -160,7 +160,7 @@
     .top-1 .rank-count { color: #ffffff; filter: drop-shadow(0 0 8px #e40075); }
     .rank-count span { font-size: var(--unit-font, 10px); font-weight: 500; color: #9ca3af; font-family: 'Noto Sans SC', sans-serif; margin-left: 1px; }
 
-    /* 底部 Date Footer */
+    /* 底部 Footer */
     .poster-footer { z-index: 2; text-align: center; margin-top: auto; padding-top: 8px; flex-shrink: 0; }
     .poster-date { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; background: rgba(228,0,117,0.1); display: inline-block; padding: 4px 18px; border-radius: 20px; border: 1px solid rgba(228,0,117,0.4); }
   </style>
@@ -380,48 +380,32 @@
       });
     }
 
-    // 终极修复：严格强行锁定 DOM 与渲染尺寸
+    // 终极方案：基于 dom-to-image 的 100% 精确高清导出
     function downloadPoster() {
-      const posterElement = document.getElementById('poster');
+      const node = document.getElementById('poster');
       
-      document.fonts.ready.then(() => {
-        window.scrollTo(0, 0);
+      // 使用 dom-to-image 保持 2 倍物理像素高清导出
+      const scale = 2;
+      const param = {
+        width: node.offsetWidth * scale,
+        height: node.offsetHeight * scale,
+        style: {
+          transform: 'scale(' + scale + ')',
+          transformOrigin: 'top left',
+          width: node.offsetWidth + 'px',
+          height: node.offsetHeight + 'px'
+        }
+      };
 
-        // 强行给 DOM 加上内联样式锁死宽高，防 html2canvas 内部克隆重新计算
-        const originalWidthStyle = posterElement.style.width;
-        const originalHeightStyle = posterElement.style.height;
-        
-        posterElement.style.width = '420px';
-        posterElement.style.height = '840px';
-
-        html2canvas(posterElement, {
-          scale: 3,                 // 3倍清晰度
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#09030c',
-          width: 420,               // 锁定导出画布宽 420
-          height: 840,              // 锁定导出画布高 840
-          windowWidth: 420,         // 锁定虚拟窗口宽
-          windowHeight: 840,        // 锁定虚拟窗口高
-          x: 0,
-          y: 0
-        }).then(canvas => {
-          // 还原原本的 DOM 样式
-          posterElement.style.width = originalWidthStyle;
-          posterElement.style.height = originalHeightStyle;
-
-          const link = document.createElement('a');
-          const titleVal = document.getElementById('input-title').value || '战报';
-          const dateVal = document.getElementById('input-date').value || '';
-          link.download = `${titleVal}_${dateVal}.png`;
-          link.href = canvas.toDataURL('image/png', 1.0);
-          link.click();
-        }).catch(err => {
-          // 即使出错也还原样式
-          posterElement.style.width = originalWidthStyle;
-          posterElement.style.height = originalHeightStyle;
-          console.error(err);
-        });
+      domtoimage.toPng(node, param).then(function (dataUrl) {
+        const link = document.createElement('a');
+        const titleVal = document.getElementById('input-title').value || '战报';
+        const dateVal = document.getElementById('input-date').value || '';
+        link.download = `${titleVal}_${dateVal}.png`;
+        link.href = dataUrl;
+        link.click();
+      }).catch(function (error) {
+        console.error('导出失败: ', error);
       });
     }
   </script>
