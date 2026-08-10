@@ -22,6 +22,7 @@
     .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; margin-top: 10px; font-size: 14px; transition: all 0.2s; }
     .btn-primary { background: linear-gradient(135deg, #e40075 0%, #900048 100%); color: #fff; box-shadow: 0 4px 15px rgba(228,0,117,0.4); }
     .btn-success { background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,0.4); }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; margin-top: 6px; font-size: 12px; padding: 6px; }
 
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
@@ -57,22 +58,12 @@
     .brand-logo-container { margin-bottom: 12px; display: flex; justify-content: center; align-items: center; min-height: 70px; }
     .brand-logo { max-height: 80px; max-width: 240px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(228, 0, 117, 0.6)); }
 
-    /* 兼容 html2canvas 的标题与标签样式 */
+    /* 标题与标签 */
     .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 16px; background: rgba(228,0,117,0.15); border: 1px solid #e40075; border-radius: 20px; font-size: 11px; font-weight: 700; color: #ff66b3; letter-spacing: 2px; margin-bottom: 10px; box-shadow: 0 0 10px rgba(228,0,117,0.3); }
-    
-    /* 改用实体高亮粉色 + 文本阴影，完全解决白盒遮挡问题 */
-    .poster-title { 
-      font-size: 32px; 
-      font-weight: 900; 
-      letter-spacing: 4px; 
-      color: #ffffff; 
-      text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075;
-    }
+    .poster-title { font-size: 32px; font-weight: 900; letter-spacing: 4px; color: #ffffff; text-shadow: 0 0 10px #e40075, 0 0 20px #e40075, 0 0 30px #e40075; }
 
     /* 榜单列表区 */
     .rank-list { flex: 1; display: flex; flex-direction: column; gap: 10px; z-index: 2; justify-content: flex-start; margin-top: 10px; margin-bottom: 20px; }
-    
-    /* 摒弃 backdrop-filter 毛玻璃，改用兼容性极佳的纯色不透明卡片 */
     .rank-item { display: flex; align-items: center; padding: 10px 16px; background: #160a1d; border: 1px solid rgba(228, 0, 117, 0.3); border-radius: 10px; position: relative; }
     .top-1 { background: #2d0520; border: 1px solid #e40075; box-shadow: 0 0 15px rgba(228, 0, 117, 0.5); padding: 13px 16px; }
     .top-2 { background: #22071a; border: 1px solid rgba(228, 0, 117, 0.7); }
@@ -101,22 +92,22 @@
     <h2>⚡ 战报数据录入</h2>
     
     <div class="form-group">
-      <label>自定义海报背景图（可选）</label>
+      <label>自定义海报背景图（已支持自动记住）</label>
       <input type="file" id="input-bg" accept="image/*" onchange="changeBg(event)">
-      <div class="help-text">💡 不上传则默认使用黑粉发光科技背景。</div>
+      <button class="btn btn-danger" onclick="clearBg()">🗑️ 清除自定义背景</button>
     </div>
 
     <div class="form-group">
       <label>榜单日期</label>
-      <input type="text" id="input-date" value="2026.08.07">
+      <input type="text" id="input-date" oninput="saveAndRender()">
     </div>
 
     <div class="form-group">
-      <label>批量粘贴 Excel 数据（姓名 跑店数）</label>
-      <textarea id="input-raw-data" rows="8" placeholder="例如：&#10;张伟 18&#10;李娜 15&#10;王强 12&#10;刘洋 10&#10;陈杰 8"></textarea>
+      <label>批量粘贴 Excel 数据（自动保存）</label>
+      <textarea id="input-raw-data" rows="8" oninput="saveAndRender()"></textarea>
     </div>
 
-    <button class="btn btn-primary" onclick="updatePoster()">🔄 生成高保真预览</button>
+    <button class="btn btn-primary" onclick="saveAndRender()">🔄 生成高保真预览</button>
     <button class="btn btn-success" onclick="downloadPoster()">📸 导出高清海报图片</button>
   </div>
 
@@ -147,22 +138,75 @@
   </div>
 
   <script>
-    document.getElementById('input-raw-data').value = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6\n周杰 5";
+    // 默认初始数据
+    const defaultData = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6\n周杰 5";
 
+    // 页面加载完毕后自动读取缓存并渲染
+    window.onload = function() {
+      // 1. 读取历史保存的日期
+      const savedDate = localStorage.getItem('poster_date') || '2026.08.07';
+      document.getElementById('input-date').value = savedDate;
+
+      // 2. 读取历史保存的人员数据
+      const savedRawData = localStorage.getItem('poster_raw_data') || defaultData;
+      document.getElementById('input-raw-data').value = savedRawData;
+
+      // 3. 读取历史保存的背景图
+      const savedBg = localStorage.getItem('poster_bg_image');
+      if (savedBg) {
+        applyBgImage(savedBg);
+      }
+
+      // 4. 渲染海报
+      updatePoster();
+    };
+
+    // 保存并实时渲染
+    function saveAndRender() {
+      const dateVal = document.getElementById('input-date').value;
+      const rawText = document.getElementById('input-raw-data').value;
+
+      // 实时保存到浏览器本地
+      localStorage.setItem('poster_date', dateVal);
+      localStorage.setItem('poster_raw_data', rawText);
+
+      updatePoster();
+    }
+
+    // 上传图片并保存到本地
     function changeBg(event) {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          const poster = document.getElementById('poster');
-          const overlay = document.getElementById('bg-overlay');
-          poster.style.backgroundImage = `url('${e.target.result}')`;
-          overlay.style.display = 'block';
+          const imgBase64 = e.target.result;
+          applyBgImage(imgBase64);
+          // 存入浏览器
+          localStorage.setItem('poster_bg_image', imgBase64);
         };
         reader.readAsDataURL(file);
       }
     }
 
+    // 应用背景图片
+    function applyBgImage(imgUrl) {
+      const poster = document.getElementById('poster');
+      const overlay = document.getElementById('bg-overlay');
+      poster.style.backgroundImage = `url('${imgUrl}')`;
+      overlay.style.display = 'block';
+    }
+
+    // 清除自定义背景
+    function clearBg() {
+      localStorage.removeItem('poster_bg_image');
+      const poster = document.getElementById('poster');
+      const overlay = document.getElementById('bg-overlay');
+      poster.style.backgroundImage = 'none';
+      overlay.style.display = 'none';
+      document.getElementById('input-bg').value = '';
+    }
+
+    // 渲染海报
     function updatePoster() {
       const dateVal = document.getElementById('input-date').value;
       document.getElementById('display-date').innerText = dateVal;
@@ -205,11 +249,10 @@
       });
     }
 
-    // 优化后的极速无损导出函数
+    // 导出高清晰图片
     function downloadPoster() {
       const posterElement = document.getElementById('poster');
       
-      // 等待网络字体准备完毕再渲染，防止文字变形错位
       document.fonts.ready.then(() => {
         html2canvas(posterElement, {
           scale: 3,
@@ -225,8 +268,6 @@
         });
       });
     }
-
-    window.onload = updatePoster;
   </script>
 </body>
 </html>
