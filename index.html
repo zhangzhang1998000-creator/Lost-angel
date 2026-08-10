@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>每日跑店排行榜生成器 - 双排高密度版</title>
+  <title>每日跑店排行榜生成器 - 双排高密度完美导出版</title>
   <script src="https://cdn.bootcdn.net/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
@@ -26,15 +26,16 @@
     /* 右侧预览区 */
     .preview-panel { flex: 1; display: flex; justify-content: center; align-items: flex-start; }
     
-    /* 核心：固定高度 820px */
+    /* 核心修复：锁死宽高像素，解决 html2canvas 截屏高度暴涨拉伸问题 */
     #poster { 
-      width: 420px; 
-      height: 820px; 
+      width: 420px !important; 
+      height: 840px !important; 
+      max-height: 840px !important;
       background-color: #09030c; 
       color: #fff; 
       padding: 30px 22px 22px; 
       position: relative; 
-      overflow: hidden; 
+      overflow: hidden !important; 
       display: flex; 
       flex-direction: column; 
       border-radius: 12px;
@@ -42,12 +43,14 @@
       box-shadow: 0 0 30px rgba(228, 0, 117, 0.2);
     }
 
+    /* 绝对定位背景层，确保完全拉满绝不变形 */
     .custom-bg-layer {
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
       z-index: 0;
       display: none;
     }
@@ -87,7 +90,7 @@
       overflow: hidden;
     }
 
-    /* Top 3 区域：固定全宽 */
+    /* Top 3 区域 */
     .top-three-container {
       display: flex;
       flex-direction: column;
@@ -95,11 +98,11 @@
       flex-shrink: 0;
     }
 
-    /* Top 4+ 双列/单列混合网格区域 */
+    /* Top 4+ 区域 */
     .others-container {
       display: grid;
       gap: var(--other-gap, 6px);
-      grid-template-columns: var(--grid-columns, 1fr); /* 动态设置1列还是2列 */
+      grid-template-columns: var(--grid-columns, 1fr);
       align-content: start;
     }
 
@@ -112,7 +115,7 @@
       border: 1px solid rgba(228, 0, 117, 0.3); 
       border-radius: 8px; 
       position: relative; 
-      min-width: 0; /* 解决 CSS Grid 内文字溢出问题 */
+      min-width: 0;
     }
 
     .top-1 { background: #2d0520; border: 1px solid #e40075; box-shadow: 0 0 12px rgba(228, 0, 117, 0.5); }
@@ -172,12 +175,12 @@
 
     <div class="form-group">
       <label>顶部小标签（副标题）</label>
-      <input type="text" id="input-badge" value="🔥 TOP PERFORMERS" oninput="saveAndRender()">
+      <input type="text" id="input-badge" value="🔥 DAILY STORE VISIT LOG" oninput="saveAndRender()">
     </div>
 
     <div class="form-group">
       <label>海报主标题</label>
-      <input type="text" id="input-title" value="跑店英雄榜" oninput="saveAndRender()">
+      <input type="text" id="input-title" value="每日跑店记录" oninput="saveAndRender()">
     </div>
     
     <div class="form-group">
@@ -215,8 +218,8 @@
         <div class="brand-logo-container">
           <img src="logo.png" alt="Brand Logo" class="brand-logo" id="logo-img" onerror="this.style.display='none'">
         </div>
-        <div class="badge" id="display-badge">🔥 TOP PERFORMERS</div>
-        <div class="poster-title" id="display-title">跑店英雄榜</div>
+        <div class="badge" id="display-badge">🔥 DAILY STORE VISIT LOG</div>
+        <div class="poster-title" id="display-title">每日跑店记录</div>
       </div>
 
       <div class="rank-list" id="rank-container">
@@ -225,23 +228,22 @@
       </div>
 
       <div class="poster-footer">
-        <div class="poster-date" id="display-date">2026.08.07</div>
+        <div class="poster-date" id="display-date">2026.08.10</div>
       </div>
     </div>
   </div>
 
   <script>
-    // 默认测试数据 (增加到 12 人演示双排效果)
-    const defaultData = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 8\n孙伟 6\n周杰 5\n张三 4\n李四 2\n王五 2\n赵六 1";
+    const defaultData = "张伟 22\n李娜 18\n王强 15\n刘洋 12\n陈杰 10\n赵敏 9\n孙伟 8\n周杰 7\n王二 6\n张三 4\n李四 2";
 
     window.onload = function() {
-      const savedBadge = localStorage.getItem('poster_badge') || '🔥 TOP PERFORMERS';
+      const savedBadge = localStorage.getItem('poster_badge') || '🔥 DAILY STORE VISIT LOG';
       document.getElementById('input-badge').value = savedBadge;
 
-      const savedTitle = localStorage.getItem('poster_title') || '跑店英雄榜';
+      const savedTitle = localStorage.getItem('poster_title') || '每日跑店记录';
       document.getElementById('input-title').value = savedTitle;
 
-      const savedDate = localStorage.getItem('poster_date') || '2026.08.07';
+      const savedDate = localStorage.getItem('poster_date') || '2026.08.10';
       document.getElementById('input-date').value = savedDate;
 
       const savedRawData = localStorage.getItem('poster_raw_data') || defaultData;
@@ -301,8 +303,8 @@
     }
 
     function updatePoster() {
-      const badgeVal = document.getElementById('input-badge').value || '🔥 TOP PERFORMERS';
-      const titleVal = document.getElementById('input-title').value || '跑店英雄榜';
+      const badgeVal = document.getElementById('input-badge').value || '🔥 DAILY STORE VISIT LOG';
+      const titleVal = document.getElementById('input-title').value || '每日跑店记录';
       const dateVal = document.getElementById('input-date').value;
       
       document.getElementById('display-badge').innerText = badgeVal;
@@ -334,21 +336,20 @@
       top3Box.innerHTML = '';
       othersBox.innerHTML = '';
 
-      // 算法逻辑：若总人数 > 8 人，自动切换为“双排布局”
       const isDoubleColumn = totalCount > 8;
 
       if (isDoubleColumn) {
-        rankListContainer.style.setProperty('--grid-columns', '1fr 1fr'); // 开启2列
+        rankListContainer.style.setProperty('--grid-columns', '1fr 1fr');
         rankListContainer.style.setProperty('--top3-gap', '6px');
         rankListContainer.style.setProperty('--other-gap', '5px');
-        rankListContainer.style.setProperty('--item-padding', '6px 8px');
-        rankListContainer.style.setProperty('--badge-size', '24px');
+        rankListContainer.style.setProperty('--item-padding', '5px 8px');
+        rankListContainer.style.setProperty('--badge-size', '22px');
         rankListContainer.style.setProperty('--badge-font', '12px');
         rankListContainer.style.setProperty('--name-font', '12px');
-        rankListContainer.style.setProperty('--count-font', '15px');
+        rankListContainer.style.setProperty('--count-font', '14px');
         rankListContainer.style.setProperty('--unit-font', '10px');
       } else {
-        rankListContainer.style.setProperty('--grid-columns', '1fr'); // 保持1列
+        rankListContainer.style.setProperty('--grid-columns', '1fr');
         rankListContainer.style.setProperty('--top3-gap', '8px');
         rankListContainer.style.setProperty('--other-gap', '8px');
         rankListContainer.style.setProperty('--item-padding', '10px 14px');
@@ -374,7 +375,6 @@
           </div>
         `;
 
-        // 前3名渲染到 top3Box（单行大卡片），4名以后渲染到 othersBox（双列网格）
         if (rank <= 3) {
           top3Box.insertAdjacentHTML('beforeend', itemHtml);
         } else {
@@ -383,6 +383,7 @@
       });
     }
 
+    // 导出的精确定制参数
     function downloadPoster() {
       const posterElement = document.getElementById('poster');
       
@@ -393,7 +394,11 @@
           scale: 3,
           useCORS: true,
           allowTaint: true,
-          backgroundColor: '#09030c'
+          backgroundColor: '#09030c',
+          width: 420,             // 强制固定导出像素宽
+          height: 840,            // 强制固定导出像素高
+          windowWidth: 420,
+          windowHeight: 840
         }).then(canvas => {
           const link = document.createElement('a');
           const titleVal = document.getElementById('input-title').value || '战报';
